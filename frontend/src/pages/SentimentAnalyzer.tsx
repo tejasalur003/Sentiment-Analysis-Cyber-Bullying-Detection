@@ -35,22 +35,29 @@ const SentimentAnalyzer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-5">
-      <h1 className="text-3xl font-bold mb-4">Sentiment Analyzer</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800 px-6 py-10">
+      <h1 className="text-3xl font-bold text-red-600 mb-6">Sentiment Analyzer</h1>
+
       <textarea
-        className="w-96 h-32 p-3 text-black rounded-md border border-gray-300"
+        className="w-full max-w-lg h-36 p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
         placeholder="Enter text here..."
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
+
       <button
-        className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-md"
+        className="mt-5 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-md transition-all duration-300"
         onClick={analyzeSentiment}
         disabled={loading}
       >
         {loading ? "Analyzing..." : "Analyze Sentiment"}
       </button>
-      {sentiment && <p className="mt-4 text-lg">{sentiment}</p>}
+
+      {sentiment && (
+        <p className="mt-4 text-lg font-medium text-gray-700 border border-gray-300 px-4 py-2 rounded-md">
+          {sentiment}
+        </p>
+      )}
     </div>
   );
 };
