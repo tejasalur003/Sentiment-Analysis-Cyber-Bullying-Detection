@@ -1,124 +1,76 @@
-// OFFICAL API TWIITER IMPLEMENTATION
-
-// import React, { useState } from "react";
-
-// const LinkSection: React.FC = () => {
-//   const [link, setLink] = useState("");
-//   const [extractedText, setExtractedText] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   const analyzeLink = async () => {
-//     if (!link) return;
-
-//     setIsLoading(true);
-//     setExtractedText(""); // Clear previous results
-
-//     try {
-//       const response = await fetch("http://localhost:5000/scrape", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ url: link }),
-//       });
-
-//       const data = await response.json();
-//       setExtractedText(data.text || "No text extracted.");
-//     } catch (error) {
-//       setExtractedText("Error fetching text.");
-//     }
-
-//     setIsLoading(false);
-//   };
-
-//   return (
-//     <div className="w-full flex flex-col items-center gap-4 p-6">
-//       <div className="w-full md:w-3/4 border-2 border-green-600 rounded-xl p-4">
-//         <input
-//           type="text"
-//           className="w-full p-3 border-none rounded-lg outline-none focus:ring-2 focus:ring-green-500"
-//           placeholder="Enter link..."
-//           value={link}
-//           onChange={(e) => setLink(e.target.value)}
-//         />
-//       </div>
-
-//       <button
-//         className="px-6 py-3 w-auto bg-green-600 text-white font-semibold text-lg rounded-xl hover:bg-green-700 transition-all"
-//         onClick={analyzeLink}
-//         disabled={isLoading}
-//       >
-//         {isLoading ? "Analyzing..." : "Analyze"}
-//       </button>
-
-//       {extractedText && (
-//         <div className="w-full md:w-3/4 bg-gray-100 p-4 rounded-xl mt-4">
-//           <h3 className="font-semibold text-lg">Extracted Text:</h3>
-//           <p className="mt-2">{extractedText}</p>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default LinkSection;
-
-
-
 import React, { useState } from "react";
 
 const LinkSection: React.FC = () => {
-  const [link, setLink] = useState("");
-  const [extractedText, setExtractedText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [url, setUrl] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [platform, setPlatform] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAnalyze = async () => {
-    if (!link.trim()) return;
-    setIsLoading(true);
-    setExtractedText("");
+  const detectPlatform = (url: string): string | null => {
+    if (url.includes("twitter.com") || url.includes("x.com")) return "Twitter";
+    if (url.includes("reddit.com")) return "Reddit";
+    return null;
+  };
+
+  const handleScrape = async () => {
+    if (!url.trim()) {
+      setError("Please enter a valid URL!");
+      return;
+    }
+
+    setError(null);
+    setContent("");
+    setPlatform(detectPlatform(url));
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/scrape", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: link }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
       });
 
-      const data = await response.json();
-      if (data.extracted_text) {
-        setExtractedText(data.extracted_text);
-      } else {
-        setExtractedText("Error: Unable to extract text.");
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
+
+      const data = await response.json();
+      setContent(data.content || "No content extracted.");
     } catch (error) {
-      setExtractedText("Error fetching data.");
+      setError("Failed to fetch content. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 p-6">
-      <div className="w-full md:w-3/4 border-2 border-green-600 rounded-xl p-4">
-        <input
-          type="text"
-          className="w-full p-3 border-none rounded-lg outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Enter Twitter link..."
-          value={link}
-          onChange={(e) => setLink(e.target.value)}
-        />
-      </div>
-
+    <div className="p-4 bg-gray-800 text-gray-100 rounded-lg max-w-3xl w-full mx-auto">
+      <h2 className="text-lg font-bold mb-2">Enter Social Media URL</h2>
+      <input
+        type="text"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="Paste link here..."
+        className="p-2 text-gray-100 bg-gray-600 rounded w-full border border-gray-400 placeholder-gray-300"
+      />
       <button
-        className="px-6 py-3 w-auto bg-green-600 text-white font-semibold text-lg rounded-xl hover:bg-green-700 transition-all"
-        onClick={handleAnalyze}
-        disabled={isLoading}
+        onClick={handleScrape}
+        className="mt-4 px-4 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded transition duration-200"
+        disabled={loading}
       >
-        {isLoading ? "Analyzing..." : "Analyze"}
+        {loading ? "Scraping..." : "Fetch Content"}
       </button>
 
-      {extractedText && (
-        <div className="w-full md:w-3/4 p-4 mt-4 border-2 border-green-500 rounded-xl bg-gray-100">
-          <h2 className="text-lg font-bold">Extracted Text:</h2>
-          <p className="mt-2">{extractedText}</p>
+      {error && <p className="mt-2 text-red-400">{error}</p>}
+
+      {content && (
+        <div className="mt-4 p-4 bg-gray-700 rounded">
+          {platform && <h3 className="text-lg font-semibold mb-2">Platform: {platform}</h3>}
+          <h3 className="text-lg font-semibold">Extracted Content:</h3>
+          <p className="mt-2 whitespace-pre-wrap">{content}</p>
         </div>
       )}
     </div>

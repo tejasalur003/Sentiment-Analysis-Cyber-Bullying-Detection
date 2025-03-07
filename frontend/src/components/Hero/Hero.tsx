@@ -3,16 +3,16 @@ import LinkSection from "./LinkSection";
 import TextSection from "./TextSection";
 
 const Hero: React.FC = () => {
-  const [results, setResults] = useState<{ link?: string; text?: string }>({});
-  const [loadingType, setLoadingType] = useState<string | null>(null);
+  const [results, setResults] = useState<{ sentiment?: string }>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const analyzeSentiment = async (input: string, type: "link" | "text") => {
+  const analyzeSentiment = async (input: string) => {
     if (!input.trim()) {
-      alert(`Please enter a valid ${type}!`);
+      alert("Please enter valid text or extract from a link!");
       return;
     }
 
-    setLoadingType(type);
+    setIsLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:5000/predict", {
         method: "POST",
@@ -24,47 +24,41 @@ const Hero: React.FC = () => {
       if (data.error) {
         alert(data.error);
       } else {
-        setResults((prev) => ({
-          ...prev,
-          [type]: `Sentiment: ${data.sentiment} (Score: ${data.score.toFixed(4)})`,
-        }));
+        setResults({
+          sentiment: `Sentiment: ${data.sentiment} (Score: ${data.score.toFixed(4)})`,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to connect to backend.");
     }
-    setLoadingType(null);
+    setIsLoading(false);
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 p-6 min-h-screen pt-24">
-      {/* Link Input Section */}
-      <LinkSection
-        onAnalyze={(input) => analyzeSentiment(input, "link")}
-        isLoading={loadingType === "link"}
-      />
-      {results.link && (
-        <p className="mt-4 text-lg font-medium text-gray-700 border border-gray-300 px-4 py-2 rounded-md">
-          {results.link}
-        </p>
-      )}
-
-      {/* Divider with "OR" */}
-      <div className="relative flex items-center w-full max-w-3xl">
-        <div className="flex-grow border-t border-gray-300"></div>
-        <span className="px-4 bg-white text-gray-500 text-lg font-semibold">OR</span>
-        <div className="flex-grow border-t border-gray-300"></div>
+    <div className="w-full flex flex-col items-center gap-8 p-6 min-h-screen pt-24 bg-gray-800 text-gray-100">
+      {/* Link Input Section - Wider with Border */}
+      <div className="w-[80%] max-w-4xl border border-gray-500 rounded-lg p-6">
+        <LinkSection />
       </div>
 
-      {/* Text Input Section */}
-      <TextSection
-        onAnalyze={(input) => analyzeSentiment(input, "text")}
-        isLoading={loadingType === "text"}
-      />
-      {results.text && (
-        <p className="mt-4 text-lg font-medium text-gray-700 border border-gray-300 px-4 py-2 rounded-md">
-          {results.text}
-        </p>
+      {/* Divider with "OR" */}
+      <div className="relative flex items-center w-[80%] max-w-4xl">
+        <div className="flex-grow border-t border-gray-400"></div>
+        <span className="px-4 bg-gray-800 text-gray-300 text-lg font-semibold">OR</span>
+        <div className="flex-grow border-t border-gray-400"></div>
+      </div>
+
+      {/* Text Input Section - Wider with Border */}
+      <div className="w-[80%] max-w-4xl border border-gray-500 rounded-lg p-6">
+        <TextSection onAnalyze={analyzeSentiment} isLoading={isLoading} />
+      </div>
+
+      {/* Sentiment Analysis Result Display */}
+      {results.sentiment && (
+        <div className="mt-4 p-4 bg-gray-700 text-gray-100 rounded-lg max-w-4xl w-[80%] text-center">
+          <p className="text-lg font-semibold">{results.sentiment}</p>
+        </div>
       )}
     </div>
   );

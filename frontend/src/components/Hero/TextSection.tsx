@@ -9,18 +9,16 @@ const TextSection: React.FC<TextSectionProps> = ({ onAnalyze, isLoading }) => {
   const [text, setText] = useState("");
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 p-6">
-      <div className="w-full md:w-3/4 border-2 border-green-600 rounded-xl p-4">
-        <textarea
-          className="w-full h-72 md:h-96 p-4 border-none rounded-lg outline-none focus:ring-2 focus:ring-green-500 resize-none"
-          placeholder="Enter text..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-      </div>
-
+    <div className="p-4 bg-gray-800 text-gray-100 rounded-lg max-w-3xl w-full mx-auto">
+      <h2 className="text-lg font-bold mb-2">Enter Text for Analysis</h2>
+      <textarea
+        className="w-full h-48 md:h-64 p-4 bg-gray-600 text-gray-100 border border-gray-400 rounded-lg outline-none focus:ring-2 focus:ring-green-400 resize-none placeholder-gray-300"
+        placeholder="Enter text..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
       <button
-        className="px-6 py-3 w-auto bg-green-600 text-white font-semibold text-lg rounded-xl hover:bg-green-700 transition-all"
+        className="mt-4 px-6 py-3 w-auto bg-green-600 text-white font-semibold text-lg rounded-lg hover:bg-green-500 transition duration-200"
         onClick={() => onAnalyze(text)}
         disabled={isLoading}
       >

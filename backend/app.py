@@ -3,7 +3,8 @@ from flask_cors import CORS
 import os
 from model import predict_sentiment
 # from WebScraper.scraper import extract_text  # OFFICIAL IMPLEMENTAION
-from WebScraper.scraper import extract_tweet_text
+# from WebScraper.scraper import extract_tweet_text
+from WebScraper.scraper import scrape_content
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
@@ -34,17 +35,29 @@ def predict():
 
 
 
+# @app.route('/scrape', methods=['POST'])
+# def scrape():
+#     """API endpoint for extracting text from Twitter."""
+#     data = request.get_json()
+#     url = data.get("url", "")
+
+#     if not url:
+#         return jsonify({"error": "No URL provided"}), 400
+
+#     extracted_text = extract_tweet_text(url)
+#     return jsonify({"extracted_text": extracted_text})
+
 @app.route('/scrape', methods=['POST'])
 def scrape():
-    """API endpoint for extracting text from Twitter."""
+    """API endpoint to scrape social media post content."""
     data = request.get_json()
-    url = data.get("url", "")
+    url = data.get("url")
 
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    extracted_text = extract_tweet_text(url)
-    return jsonify({"extracted_text": extracted_text})
+    content = scrape_content(url)
+    return jsonify({"content": content})
 
 
 if __name__ == '__main__':

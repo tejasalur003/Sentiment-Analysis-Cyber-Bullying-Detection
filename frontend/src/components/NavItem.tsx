@@ -5,7 +5,10 @@ interface NavItemProps {
 }
 
 const NavItem: React.FC<NavItemProps> = ({ title }) => (
-  <a href="#" className="text-gray-700 hover:text-red-600 font-medium">
+  <a
+    href="#"
+    className="text-gray-300 hover:text-sky-400 font-medium transition duration-300"
+  >
     {title}
   </a>
 );
