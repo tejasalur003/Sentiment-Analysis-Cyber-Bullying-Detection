@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LinkSection from "./LinkSection";
 import TextSection from "./TextSection";
+import Loader from "../Loader";
 
 const Hero: React.FC = () => {
-  const [results, setResults] = useState<{ sentiment?: string }>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const analyzeSentiment = async (input: string) => {
     if (!input.trim()) {
@@ -24,8 +26,12 @@ const Hero: React.FC = () => {
       if (data.error) {
         alert(data.error);
       } else {
-        setResults({
-          sentiment: `Sentiment: ${data.sentiment} (Score: ${data.score.toFixed(4)})`,
+        navigate("/analysis", {
+          state: {
+            text: input,
+            sentiment: data.sentiment,
+            score: data.score.toFixed(4),
+          },
         });
       }
     } catch (error) {
@@ -37,29 +43,27 @@ const Hero: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center gap-8 p-6 min-h-screen pt-24 bg-gray-800 text-gray-100">
-      {/* Link Input Section - Wider with Border */}
+      {/* Loader */}
+      <Loader isLoading={isLoading} />
+
+      {/* Link Input Section */}
       <div className="w-[80%] max-w-4xl border border-gray-500 rounded-lg p-6">
-        <LinkSection />
+        <LinkSection onAnalyze={analyzeSentiment} />
       </div>
 
       {/* Divider with "OR" */}
       <div className="relative flex items-center w-[80%] max-w-4xl">
         <div className="flex-grow border-t border-gray-400"></div>
-        <span className="px-4 bg-gray-800 text-gray-300 text-lg font-semibold">OR</span>
+        <span className="px-4 bg-gray-800 text-gray-300 text-lg font-semibold">
+          OR
+        </span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
 
-      {/* Text Input Section - Wider with Border */}
+      {/* Text Input Section */}
       <div className="w-[80%] max-w-4xl border border-gray-500 rounded-lg p-6">
         <TextSection onAnalyze={analyzeSentiment} isLoading={isLoading} />
       </div>
-
-      {/* Sentiment Analysis Result Display */}
-      {results.sentiment && (
-        <div className="mt-4 p-4 bg-gray-700 text-gray-100 rounded-lg max-w-4xl w-[80%] text-center">
-          <p className="text-lg font-semibold">{results.sentiment}</p>
-        </div>
-      )}
     </div>
   );
 };

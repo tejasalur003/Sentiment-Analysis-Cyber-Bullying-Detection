@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Loader from "../Loader";
 
 interface TextSectionProps {
   onAnalyze: (input: string) => void;
@@ -10,6 +11,9 @@ const TextSection: React.FC<TextSectionProps> = ({ onAnalyze, isLoading }) => {
 
   return (
     <div className="p-4 bg-gray-800 text-gray-100 rounded-lg max-w-3xl w-full mx-auto">
+      {/* Loader */}
+      <Loader isLoading={isLoading} />
+
       <h2 className="text-lg font-bold mb-2">Enter Text for Analysis</h2>
       <textarea
         className="w-full h-48 md:h-64 p-4 bg-gray-600 text-gray-100 border border-gray-400 rounded-lg outline-none focus:ring-2 focus:ring-green-400 resize-none placeholder-gray-300"
