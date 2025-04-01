@@ -5,6 +5,7 @@ from model import predict_sentiment
 # from WebScraper.scraper import extract_text  # OFFICIAL IMPLEMENTAION
 # from WebScraper.scraper import extract_tweet_text
 from WebScraper.scraper import scrape_content
+from cbd_predict import predict_cyberbullying
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
@@ -58,6 +59,23 @@ def scrape():
 
     content = scrape_content(url)
     return jsonify({"content": content})
+
+@app.route('/cbd_predict', methods=['POST'])
+def cbd_predict():
+    try:
+        data = request.get_json()
+        text = data.get("text", "")
+        
+        if not text:
+            return jsonify({"error": "No input text provided"}), 400
+        
+        prediction = predict_cyberbullying(text)
+        
+        return jsonify({"prediction": prediction})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 
 if __name__ == '__main__':
