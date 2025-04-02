@@ -52,21 +52,23 @@ const LinkSection: React.FC<LinkSectionProps> = ({ onAnalyze }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-800 text-gray-100 rounded-lg max-w-3xl w-full mx-auto">
+    <div className="p-6 bg-gray-900 text-gray-300 border border-gray-800 rounded-xl shadow-lg max-w-3xl w-full mx-auto font-poppins">
       {/* Loader */}
       <Loader isLoading={isLoading} />
 
-      <h2 className="text-lg font-bold mb-2">Enter Social Media URL</h2>
+      <h2 className="text-xl font-semibold mb-3 text-gray-200 tracking-wide">Enter Social Media URL</h2>
+      
       <input
         type="text"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Paste link here..."
-        className="p-2 text-gray-100 bg-gray-600 rounded w-full border border-gray-400 placeholder-gray-300"
+        className="p-3 text-white bg-gray-800 rounded w-full border border-gray-600 placeholder-gray-400 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-500 tracking-wide"
       />
+      
       <button
         onClick={handleScrape}
-        className="mt-4 px-4 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded transition duration-200"
+        className="mt-4 px-5 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-lg transition duration-200"
       >
         Fetch Content
       </button>
@@ -74,12 +76,12 @@ const LinkSection: React.FC<LinkSectionProps> = ({ onAnalyze }) => {
       {error && <p className="mt-2 text-red-400">{error}</p>}
 
       {content && (
-        <div className="mt-4 p-4 bg-gray-700 rounded">
-          {platform && <h3 className="text-lg font-semibold mb-2">Platform: {platform}</h3>}
-          <h3 className="text-lg font-semibold">Extracted Content:</h3>
-          <p className="mt-2 whitespace-pre-wrap">{content}</p>
+        <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+          {platform && <h3 className="text-lg font-semibold text-gray-300 mb-2">Platform: {platform}</h3>}
+          <h3 className="text-lg font-semibold text-gray-300">Extracted Content:</h3>
+          <p className="mt-2 whitespace-pre-wrap text-gray-400">{content}</p>
           <button
-            className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-400 text-white font-semibold rounded transition duration-200"
+            className="mt-4 px-5 py-2 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-lg transition duration-200"
             onClick={() => onAnalyze(content)}
           >
             Analyze

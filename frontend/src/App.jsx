@@ -6,6 +6,7 @@ import Home from "./pages/Home.tsx";
 import SentimentAnalyzer from "./pages/SentimentAnalyzer.tsx";
 import Analysis from "./pages/Analysis.tsx";
 import Cbd from "./pages/cbd.tsx";
+import SentimentScale from "./components/SentimentScale.tsx";
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
         <Route path="/" element={<Home />} />
         {/* <Route path="/analyze" element={<SentimentAnalyzer />} /> */}
         <Route path="/analysis" element={<Analysis />} />
-        <Route path="/cbd" element={<Cbd/>} />
+        <Route path="/cyberbullying-check" element={<Cbd/>} />
+        <Route path="/scale" element={<SentimentScale/>} />
+
 
       </Routes>
       <Footer />
