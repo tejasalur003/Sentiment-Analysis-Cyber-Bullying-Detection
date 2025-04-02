@@ -39,5 +39,18 @@ def predict_sentiment(review):
     review_pad = pad_sequences(review_seq, maxlen=max_words, padding='post')
 
     prediction = model.predict(review_pad)[0][0]  # Get probability score
-    sentiment = "Positive" if prediction >= 0.5 else "Negative"
+
+    # Define sentiment categories based on score
+    if prediction < 0.2:
+        sentiment = "Extremely Negative"
+    elif 0.2 <= prediction < 0.4:
+        sentiment = "Slightly Negative"
+    elif 0.4 <= prediction < 0.6:
+        sentiment = "Neutral"
+    elif 0.6 <= prediction < 0.8:
+        sentiment = "Slightly Positive"
+    else:
+        sentiment = "Very Positive"
+
     return {"sentiment": sentiment, "score": float(prediction)}
+
