@@ -72,6 +72,17 @@ const Analysis: React.FC = () => {
 
           {(
             <button
+            className={`px-6 py-2 text-white font-semibold rounded-lg transition-all ${
+               "bg-blue-500 hover:bg-blue-700 font-medium text-lg rounded-lg transition duration-200"
+            }`}
+              onClick={() => navigate("/emotion-analysis", { state: { text } })}
+            >
+              Emotion Analysis
+            </button>
+          )}
+
+          {(
+            <button
               className="px-6 py-3 bg-yellow-600 hover:bg-yellow-500 text-white font-medium text-lg rounded-lg transition duration-200"
               onClick={() => navigate("/cyberbullying-check", { state: { text } })}
             >
