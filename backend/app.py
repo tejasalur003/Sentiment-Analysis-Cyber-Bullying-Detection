@@ -6,7 +6,7 @@ from model import predict_sentiment
 # from WebScraper.scraper import extract_tweet_text
 from WebScraper.scraper import scrape_content
 from cbd_predict import predict_cyberbullying
-
+from emotion_predict import predict_emotion_detailed
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
 
@@ -77,6 +77,16 @@ def cbd_predict():
         return jsonify({"error": str(e)}), 500
     
 
+@app.route('/predict-emotion', methods=['POST'])
+def predict_emotion():
+    data = request.get_json()
+    if 'text' not in data:
+        return jsonify({"error": "Missing 'text' in request"}), 400
+
+    text = data['text']
+    scores = predict_emotion_detailed(text)
+
+    return jsonify(scores)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

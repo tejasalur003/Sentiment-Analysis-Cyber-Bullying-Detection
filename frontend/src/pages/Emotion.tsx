@@ -3,20 +3,16 @@ import { useLocation } from "react-router-dom";
 import Loader from "../components/Loader";
 
 interface EmotionScores {
-  joy: number;
-  sadness: number;
-  anger: number;
-  fear: number;
-  love: number;
-  surprise: number;
+  [emotion: string]: number;
 }
 
-const EmotionAnalysis = () => {
+const Emotion = () => {
   const location = useLocation();
   const [text, setText] = useState<string>("");
   const [emotionScores, setEmotionScores] = useState<EmotionScores | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     if (location.state?.text) {
@@ -33,9 +29,10 @@ const EmotionAnalysis = () => {
     setIsLoading(true);
     setError(null);
     setEmotionScores(null);
+    setShowDropdown(false);
 
     try {
-      const response = await fetch("http://localhost:5000/emotion_analyze", {
+      const response = await fetch("http://localhost:5000/predict-emotion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
@@ -46,12 +43,8 @@ const EmotionAnalysis = () => {
       }
 
       const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setEmotionScores(data.scores);
+      console.log("Backend response:", data);
+      setEmotionScores(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred.");
       console.error("Error detecting emotion:", err);
@@ -60,32 +53,20 @@ const EmotionAnalysis = () => {
     }
   };
 
-  const generateReport = () => {
-    if (!emotionScores) return "";
-
-    // Sort emotions by score in descending order
-    const sortedEmotions = Object.entries(emotionScores)
-      .map(([emotion, score]) => ({ emotion, score }))
-      .sort((a, b) => b.score - a.score);
-
-    // Get top 3 emotions
-    const topEmotions = sortedEmotions.slice(0, 3);
-
-    if (topEmotions.length < 1) return "No strong emotion detected.";
-
-    const [dominant, second, third] = topEmotions;
-    let report = `The dominant emotion detected is **${dominant.emotion}** with a confidence of **${dominant.score.toFixed(2)}%**.`;
-
-    if (second) {
-      report += ` However, there is also a strong presence of **${second.emotion}** at **${second.score.toFixed(2)}%**.`;
-    }
-
-    if (third) {
-      report += ` Additionally, **${third.emotion}** is detected at **${third.score.toFixed(2)}%**.`;
-    }
-
-    return report;
+  const getPrimaryEmotion = () => {
+    if (!emotionScores) return null;
+    const sorted = Object.entries(emotionScores).sort((a, b) => b[1] - a[1]);
+    return sorted[0];
   };
+
+  const getOtherEmotions = () => {
+    if (!emotionScores) return [];
+    const sorted = Object.entries(emotionScores).sort((a, b) => b[1] - a[1]);
+    return sorted.slice(1);
+  };
+
+  const primaryEmotion = getPrimaryEmotion();
+  const otherEmotions = getOtherEmotions();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-200 px-6">
@@ -102,12 +83,11 @@ const EmotionAnalysis = () => {
         ></textarea>
 
         {error && (
-          <div className="mt-4 p-3 bg-blue-500 text-white rounded-lg text-center">
+          <div className="mt-4 p-3 bg-red-500 text-white rounded-lg text-center">
             {error}
           </div>
         )}
 
-        {/* Loader Component */}
         <Loader isLoading={isLoading} />
 
         <div className="flex justify-center mt-4">
@@ -122,19 +102,39 @@ const EmotionAnalysis = () => {
           </button>
         </div>
 
-        {emotionScores && (
+        {primaryEmotion && (
           <div className="mt-6 p-4 bg-gray-700 rounded-lg border border-blue-500">
-            <h3 className="text-xl font-semibold mb-2 text-gray-300">Emotion Report:</h3>
-            <p className="text-gray-300">{generateReport()}</p>
+            <h3 className="text-xl font-semibold mb-4 text-gray-300">Result:</h3>
+            <p className="text-gray-300">
+              The most prominent emotion expressed in the text is{" "}
+              <span className="text-white font-bold">"{primaryEmotion[0]}"</span> with a confidence score of{" "}
+              <span className="font-bold">{primaryEmotion[1].toFixed(2)}%</span>.
+            </p>
 
-            <div className="mt-4">
-              {Object.entries(emotionScores).map(([emotion, score]) => (
-                <div key={emotion} className="flex justify-between text-gray-300">
-                  <span className="capitalize">{emotion}</span>
-                  <span className="font-bold">{score.toFixed(2)}%</span>
-                </div>
-              ))}
-            </div>
+            {otherEmotions.length > 0 && (
+              <div className="mt-4">
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="text-blue-400 hover:underline focus:outline-none"
+                >
+                  {showDropdown ? "Hide Other Emotions" : "Show Other Emotions"}
+                </button>
+
+                {showDropdown && (
+                  <div className="mt-2 bg-gray-800 rounded-lg border border-gray-600 p-3 space-y-2">
+                    {otherEmotions.map(([emotion, score]) => (
+                      <div
+                        key={emotion}
+                        className="flex justify-between text-gray-300"
+                      >
+                        <span className="capitalize">"{emotion}"</span>
+                        <span className="font-bold">{score.toFixed(2)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -142,4 +142,4 @@ const EmotionAnalysis = () => {
   );
 };
 
-export default EmotionAnalysis;
+export default Emotion;
