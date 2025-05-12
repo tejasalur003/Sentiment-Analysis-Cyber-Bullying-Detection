@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from model import predict_sentiment
+from Models.model import predict_sentiment
 # from WebScraper.scraper import extract_text  # OFFICIAL IMPLEMENTAION
 # from WebScraper.scraper import extract_tweet_text
 from WebScraper.scraper import scrape_content
-from cbd_predict import predict_cyberbullying
-from emotion_predict import predict_emotion_detailed
+from Models.cbd_predict import predict_cyberbullying
+from Models.emotion_predict import predict_emotion_detailed
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
 

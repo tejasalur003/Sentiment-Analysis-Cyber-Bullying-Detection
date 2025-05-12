@@ -7,11 +7,15 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import tensorflow as tf
 import pickle
 
-# Load the saved model (from .h5 file)
-model = tf.keras.models.load_model('emotion_recognizer.h5')
+# Define paths to the model and tokenizer
+MODEL_PATH = "./EmotionAnalysis/emotion_recognizer.h5"
+TOKENIZER_PATH = "./EmotionAnalysis/tokenizer1.pkl"
+
+# Load the saved model
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Load the saved tokenizer
-with open('tokenizer1.pkl', 'rb') as f:
+with open(TOKENIZER_PATH, "rb") as f:
     tokenizer = pickle.load(f)
 
 # Maximum length of the input text (same as used during model training)
