@@ -1,70 +1,26 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import LinkSection from "./LinkSection";
 import TextSection from "./TextSection";
-import Loader from "../Loader";
 
-const Hero: React.FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
-
-  const analyzeSentiment = async (input: string) => {
-    if (!input.trim()) {
-      alert("Please enter valid text or extract from a link!");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input }),
-      });
-
-      const data = await response.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        // Ensure `score` is a valid number
-        const score = parseFloat(data.score.toFixed(4));
-
-        navigate("/analysis", {
-          state: {
-            text: input,
-            sentiment: data.sentiment,
-            score, // Pass as a number
-          },
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to connect to backend.");
-    }
-    setIsLoading(false);
-  };
-
+const Hero = () => {
   return (
-    <div className="w-full flex flex-col items-center gap-8 p-6 min-h-screen pt-24 bg-gray-950 text-gray-300">
-      {/* Loader */}
-      <Loader isLoading={isLoading} />
-
+    <div className="w-full flex flex-col items-center gap-12 p-6 min-h-screen pt-24 bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77] text-gray-100">
+      
       {/* Link Input Section */}
-      <div className="w-[80%] max-w-4xl bg-gray-900 text-white border border-gray-800 rounded-xl shadow-lg p-6">
-        <LinkSection onAnalyze={analyzeSentiment} />
-      </div>
+      <LinkSection />
 
       {/* Divider with "OR" */}
       <div className="relative flex items-center w-[80%] max-w-4xl">
-        <div className="flex-grow border-t border-gray-600"></div>
-        <span className="px-4 bg-gray-950 text-gray-500 text-lg font-medium">OR</span>
-        <div className="flex-grow border-t border-gray-600"></div>
+        <div className="flex-grow border-t border-blue-900"></div>
+        <span className="px-6 py-1 text-white text-lg font-bold bg-white/20 backdrop-blur-md shadow-[0_0_10px_rgba(255,255,255,0.3)] rounded-full">
+          OR
+        </span>
+        <div className="flex-grow border-t border-blue-900"></div>
       </div>
 
       {/* Text Input Section */}
-      <div className="w-[80%] max-w-4xl bg-gray-900 text-white border border-gray-800 rounded-xl shadow-lg p-6">
-        <TextSection onAnalyze={analyzeSentiment} isLoading={isLoading} />
-      </div>
+      <TextSection />
+
     </div>
   );
 };

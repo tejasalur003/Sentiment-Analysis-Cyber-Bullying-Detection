@@ -6,12 +6,9 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import os
 
-# Define the base directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = "./SentimentAnalysis/sentiment_model.h5"
+TOKENIZER_PATH = "./SentimentAnalysis/tokenizer.pkl"
 
-# Load the trained model
-MODEL_PATH = os.path.join(BASE_DIR, "sentiment_model.h5")
-TOKENIZER_PATH = os.path.join(BASE_DIR, "tokenizer.pkl")
 
 model = load_model(MODEL_PATH)
 

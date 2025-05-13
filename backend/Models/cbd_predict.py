@@ -5,14 +5,21 @@ import nltk
 import json
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# Load trained model and tokenizer
-model = tf.keras.models.load_model('cyberbullying-multiclass.h5')
+# Load trained model from adjacent CyberbullyingDetection folder
+MODEL_PATH = "./CyberbullyingDetection/cyberbullying-multiclass.h5"
+TOKENIZER_PATH = "./CyberbullyingDetection/tokenizer.json"
+LABEL_MAPPING_PATH = "./CyberbullyingDetection/label_mapping.npy"
 
-with open("tokenizer.json", "r") as file:
+# Load model
+model = tf.keras.models.load_model(MODEL_PATH)
+
+# Load tokenizer
+with open(TOKENIZER_PATH, "r") as file:
     tokenizer_json = file.read()
 tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_json)
 
-label_mapping = np.load("label_mapping.npy", allow_pickle=True).item()  # Load label encoding
+# Load label mapping
+label_mapping = np.load(LABEL_MAPPING_PATH, allow_pickle=True).item()
 
 # Ensure NLTK stopwords are downloaded
 nltk.download('stopwords')
