@@ -7,6 +7,8 @@ from Models.model import predict_sentiment
 from WebScraper.scraper import scrape_content
 from Models.cbd_predict import predict_cyberbullying
 from Models.emotion_predict import predict_emotion_detailed
+from WebScraper.profile_scrapper import get_latest_tweets
+
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
 
@@ -87,6 +89,20 @@ def predict_emotion():
     scores = predict_emotion_detailed(text)
 
     return jsonify(scores)
+
+@app.route('/profile-review', methods=['POST'])
+def profile_review():
+    data = request.get_json()
+    user_url = data.get('url')
+    num = data.get('num', 3)
+
+    if not user_url or not isinstance(num, int):
+        return jsonify({"error": "Missing or invalid 'url' or 'num' parameters"}), 400
+
+    tweets = get_latest_tweets(user_url, num)
+    return jsonify({"tweet_links": tweets})
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

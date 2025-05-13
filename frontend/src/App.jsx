@@ -9,6 +9,7 @@ import Cbd from "./pages/cbd.tsx";
 import SentimentScale from "./components/SentimentScale.tsx";
 import Emotion from "./pages/Emotion.tsx";
 import ExtractedText from "./pages/ExtractedText.tsx";
+import ProfileReview from "./pages/ProfileReview.tsx";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/cyberbullying-check" element={<Cbd/>} />
         {/* <Route path="/scale" element={<SentimentScale/>} /> */}
         <Route path="/emotion-analysis" element={<Emotion/>} />
+        <Route path="/profile-review" element={<ProfileReview/>} />
 
 
       </Routes>
