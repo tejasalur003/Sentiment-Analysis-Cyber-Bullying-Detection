@@ -12,9 +12,9 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <div className="flex space-x-8 text-gray-200">
-        <NavItem title="Analyze Text" />
-        <NavItem title="Data Insights" />
-        <NavItem title="Models" />
+        <NavItem title="Profile Review" href="profile-review"/>
+        <NavItem title="Adjust Tone" href="#" />
+        <NavItem title="Mental Health Support" href="#"/>
         <Dropdown title="More" items={["API Docs", "Blog", "Support"]} />
       </div>
     </nav>
