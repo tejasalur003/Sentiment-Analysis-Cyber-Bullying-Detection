@@ -1,6 +1,8 @@
+// src/components/LinkSection.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader";
+import { postScrape } from "../../api/PostScrape"; // ✅ Updated import
 
 const LinkSection: React.FC = () => {
   const [url, setUrl] = useState<string>("");
@@ -26,20 +28,7 @@ const LinkSection: React.FC = () => {
 
     try {
       const platform = detectPlatform(url);
-
-      const response = await fetch("http://localhost:5000/scrape", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await postScrape(url); 
       const content = data.content || "";
 
       navigate("/extracted-text", {
@@ -49,6 +38,7 @@ const LinkSection: React.FC = () => {
         },
       });
     } catch (error) {
+      console.error(error);
       setError("Failed to fetch content. Please try again.");
     } finally {
       setIsLoading(false);
@@ -56,11 +46,12 @@ const LinkSection: React.FC = () => {
   };
 
   return (
-      <div className="w-[80%] max-w-4xl p-12 bg-gray-900 text-gray-300 border border-gray-800 rounded-xl shadow-lg font-poppins mx-auto">
-   
+    <div className="w-[80%] max-w-4xl p-12 bg-gray-900 text-gray-300 border border-gray-800 rounded-xl shadow-lg font-poppins mx-auto">
       <Loader isLoading={isLoading} />
 
-      <h2 className="text-xl font-semibold mb-3 text-gray-200 tracking-wide">Enter Social Media URL</h2>
+      <h2 className="text-xl font-semibold mb-3 text-gray-200 tracking-wide">
+        Enter Social Media URL
+      </h2>
 
       <input
         type="text"
@@ -73,7 +64,7 @@ const LinkSection: React.FC = () => {
       <button
         onClick={handleScrape}
         className="mt-4 px-5 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-lg transition duration-200"
-        >
+      >
         Fetch Content
       </button>
 
