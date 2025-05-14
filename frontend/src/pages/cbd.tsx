@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Loader from "../components/Loader";
+import { predictCyberbullying } from "../api/CBDPredict"
 
 const Cbd = () => {
   const location = useLocation();
@@ -26,23 +27,8 @@ const Cbd = () => {
     setPrediction(null);
 
     try {
-      const response = await fetch("http://localhost:5000/cbd_predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch prediction from backend.");
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setPrediction(data.prediction);
+      const result = await predictCyberbullying(text); 
+      setPrediction(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred.");
       console.error("Error detecting cyberbullying:", err);
@@ -71,7 +57,6 @@ const Cbd = () => {
           </div>
         )}
 
-        {/* Loader Component */}
         <Loader isLoading={isLoading} />
 
         <div className="flex justify-center mt-4">

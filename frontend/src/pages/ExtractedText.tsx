@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
+import { predictSentiment } from "../api/SentimentPredict"; 
 
 const ExtractedText: React.FC = () => {
   const navigate = useNavigate();
@@ -20,19 +21,12 @@ const ExtractedText: React.FC = () => {
   const analyzeSentiment = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: content }),
-      });
-
-      const data = await response.json();
-      const score = parseFloat(data.score.toFixed(4));
+      const { sentiment, score } = await predictSentiment(content);
 
       navigate("/analysis", {
         state: {
           text: content,
-          sentiment: data.sentiment,
+          sentiment,
           score,
         },
       });
