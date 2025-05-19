@@ -10,6 +10,7 @@ import Cbd from "./pages/cbd.tsx";
 import Emotion from "./pages/Emotion.tsx";
 import ExtractedText from "./pages/ExtractedText.tsx";
 import ProfileReview from "./pages/ProfileReview.tsx";
+import Mail from "./pages/Mail.tsx";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         {/* <Route path="/scale" element={<SentimentScale/>} /> */}
         <Route path="/emotion-analysis" element={<Emotion/>} />
         <Route path="/profile-review" element={<ProfileReview/>} />
+        <Route path="/send-email" element={<Mail/>} />
 
 
       </Routes>
