@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from dotenv import load_dotenv
 import smtplib
 from email.message import EmailMessage
+
 from Models.model import predict_sentiment
 # from WebScraper.scraper import extract_text  # OFFICIAL IMPLEMENTAION
 # from WebScraper.scraper import extract_tweet_text
@@ -106,8 +108,8 @@ def profile_review():
 
 
 
-SENDER_EMAIL = "tejasalur03@gmail.com"
-SENDER_PASSWORD = "rfecqfmrkxalndej"  # Use App Password, not your actual password
+SENDER_EMAIL = os.getenv("EMAIL_USER")
+SENDER_PASSWORD = os.getenv("EMAIL_PASS")
 
 @app.route('/send-email', methods=['POST'])
 def send_email():

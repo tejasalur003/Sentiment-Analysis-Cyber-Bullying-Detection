@@ -10,12 +10,12 @@ import Cbd from "./pages/cbd.tsx";
 import Emotion from "./pages/Emotion.tsx";
 import ExtractedText from "./pages/ExtractedText.tsx";
 import ProfileReview from "./pages/ProfileReview.tsx";
-import SendEmail from "./components/SendMail.tsx";
+import Mail from "./pages/Mail.tsx";
 
 function App() {
   return (
     <Router>
-      {/* <Navbar /> */}
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/extracted-text" element={<ExtractedText />} />
@@ -25,11 +25,11 @@ function App() {
         {/* <Route path="/scale" element={<SentimentScale/>} /> */}
         <Route path="/emotion-analysis" element={<Emotion/>} />
         <Route path="/profile-review" element={<ProfileReview/>} />
-        <Route path="/send-email" element={<SendEmail/>} />
+        <Route path="/send-email" element={<Mail/>} />
 
 
       </Routes>
-      {/* <Footer /> */}
+      <Footer />
     </Router>
   );
 }

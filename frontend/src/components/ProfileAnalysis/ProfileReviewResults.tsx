@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { predictSentiment } from "../../api/SentimentPredict";
 import { postScrape } from "../../api/PostScrape";
 import { predictCyberbullying } from "../../api/CBDPredict";
@@ -9,6 +10,8 @@ interface ProfileReviewResultsProps {
 }
 
 interface TweetAnalysisResult {
+  link: string;
+  text: string;
   sentiment: string;
   score: number;
   emotion: string;
@@ -17,6 +20,7 @@ interface TweetAnalysisResult {
 }
 
 const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks }) => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<(TweetAnalysisResult | null)[]>(Array(tweetLinks.length).fill(null));
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
@@ -27,7 +31,7 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
     setIsLoading(true);
 
     for (let i = 0; i < tweetLinks.length; i++) {
-      setCurrentIndex(i); // Show progress (i.e. 1/4)
+      setCurrentIndex(i);
 
       try {
         const url = tweetLinks[i];
@@ -41,10 +45,11 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
         const sortedEmotions = Object.entries(emotionScores).sort((a, b) => b[1] - a[1]);
         const [primaryEmotion, primaryScore] = sortedEmotions[0];
 
-        // Update that specific index's result
         setResults(prev => {
           const updated = [...prev];
           updated[i] = {
+            link: url,
+            text,
             sentiment,
             score,
             emotion: primaryEmotion,
@@ -60,6 +65,16 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
 
     setCurrentIndex(null);
     setIsLoading(false);
+  };
+
+  const analyzeResults = () => {
+    const validResults = results.filter(r => r !== null) as TweetAnalysisResult[];
+
+    if (validResults.length > 0) {
+      navigate("/send-email", { state: { results: validResults } });
+    } else {
+      alert("No results to analyze. Please analyze tweets first.");
+    }
   };
 
   return (
@@ -118,6 +133,13 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
             ? `Analyzing (${currentIndex + 1}/${tweetLinks.length})...`
             : "Analyzing..."
           : "Analyze Tweets"}
+      </button>
+
+      <button
+        onClick={analyzeResults}
+        className="mt-4 ml-4 px-5 py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition duration-200"
+      >
+        Analyze Results
       </button>
     </div>
   );
