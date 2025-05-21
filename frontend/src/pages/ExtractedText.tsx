@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
-import { predictSentiment } from "../api/SentimentPredict"; 
+import { predictSentiment } from "../api/SentimentPredict";
 
 const ExtractedText: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const ExtractedText: React.FC = () => {
 
   if (!content) {
     return (
-      <div className="pt-24 pb-32 px-6 text-center text-red-400 text-xl min-h-screen bg-gray-950 font-poppins">
+      <div className="pt-24 pb-32 px-6 text-center text-red-400 text-xl min-h-screen font-poppins">
         No content found. Please extract content again.
       </div>
     );
@@ -51,13 +51,13 @@ const ExtractedText: React.FC = () => {
   const emojis = extractEmojis(content);
 
   return (
-    <div className="pt-24 pb-32 px-6 min-h-screen bg-gray-950 text-gray-200 font-poppins">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Section - Original Content */}
-        <div className="md:col-span-2 bg-gray-900 border border-gray-800 rounded-lg p-6 shadow-lg">
+    <div className="pt-24 px-6 min-h-screen text-gray-200 font-poppins">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Section */}
+        <div className="lg:col-span-2 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg p-6 shadow-md">
           <h2 className="text-xl font-semibold mb-3">Platform: {platform}</h2>
           <h3 className="text-lg font-semibold text-gray-300 mb-2">Original Extracted Text:</h3>
-          <p className="whitespace-pre-wrap text-gray-400 mb-4">{content}</p>
+          <p className="whitespace-pre-wrap text-gray-300 mb-4">{content}</p>
 
           <button
             onClick={analyzeSentiment}
@@ -77,34 +77,46 @@ const ExtractedText: React.FC = () => {
             </div>
           )}
 
-          <p className="mt-6 text-gray-500 italic">
+          <p className="mt-6 text-gray-400 italic">
             Plain text with no emojis, usernames, or hashtags:
           </p>
-          <p className="text-gray-400 mt-2">{plainText}</p>
+          <p className="text-gray-300 mt-2">{plainText}</p>
         </div>
 
-        {/* Right Section - Highlights */}
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 shadow-lg">
+        {/* Sidebar */}
+        <div className="bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg p-6 shadow-md">
           <h3 className="text-lg font-semibold mb-4 text-gray-300">Highlights</h3>
 
           <div className="mb-4">
             <h4 className="text-gray-400 font-semibold">Usernames:</h4>
-            <ul className="text-sm text-orange-400 mt-1">
-              {usernames.length ? usernames.map((u, i) => <li key={i}>{u}</li>) : <li>None</li>}
+            <ul className="text-sm mt-1">
+              {usernames.length
+                ? usernames.map((u, i) => (
+                    <li key={i} className="text-green-400">{u}</li>
+                  ))
+                : <li className="text-[#FF4500]">None</li>}
             </ul>
           </div>
 
           <div className="mb-4">
             <h4 className="text-gray-400 font-semibold">Hashtags:</h4>
-            <ul className="text-sm text-orange-400 mt-1">
-              {hashtags.length ? hashtags.map((h, i) => <li key={i}>{h}</li>) : <li>None</li>}
+            <ul className="text-sm mt-1">
+              {hashtags.length
+                ? hashtags.map((h, i) => (
+                    <li key={i} className="text-green-400">{h}</li>
+                  ))
+                : <li className="text-[#FF4500]">None</li>}
             </ul>
           </div>
 
           <div>
             <h4 className="text-gray-400 font-semibold">Emojis:</h4>
-            <ul className="text-sm text-orange-400 mt-1">
-              {emojis.length ? emojis.map((e, i) => <li key={i}>{e}</li>) : <li>None</li>}
+            <ul className="text-sm mt-1">
+              {emojis.length
+                ? emojis.map((e, i) => (
+                    <li key={i} className="text-green-400">{e}</li>
+                  ))
+                : <li className="text-[#FF4500]">None</li>}
             </ul>
           </div>
         </div>

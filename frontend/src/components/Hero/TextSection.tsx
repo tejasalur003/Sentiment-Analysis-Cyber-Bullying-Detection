@@ -36,27 +36,42 @@ const TextSection: React.FC = () => {
   };
 
   return (
-    <div className="w-[80%] max-w-4xl p-12 bg-gray-900 text-gray-300 border border-gray-800 rounded-xl shadow-lg font-poppins mx-auto">    
+    <div className="w-[90%] max-w-5xl p-10 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg font-poppins mx-auto">
+
       <Loader isLoading={isLoading} />
 
-      <h2 className="text-xl font-semibold mb-3 text-gray-200 tracking-wide">Enter Text for Analysis</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-100 tracking-wide">
+        Enter Text for Analysis
+      </h2>
 
       <textarea
-        className="w-full h-48 md:h-64 p-4 bg-gray-700 text-white border border-gray-600 rounded-lg outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-500 tracking-wide"
-        placeholder="Enter text..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
+  className="
+    w-full h-48 md:h-64 p-3 rounded-md 
+    bg-gray-800 border border-gray-600 
+    shadow-[0_2px_15px_rgba(129,140,248,0.15)]
+    placeholder-gray-400 text-white 
+    focus:outline-none focus:ring-2 focus:ring-white focus:border-white 
+    tracking-wide transition
+  "
+  placeholder="Enter text..."
+  value={text}
+  onChange={(e) => setText(e.target.value)}
+/>
+
+
 
       <button
-        className="mt-4 px-5 py-2 bg-green-500 text-white font-medium text-lg rounded-lg hover:bg-green-400 transition duration-200 tracking-wide"
+        className="
+          mt-5 px-6 py-2 bg-green-600 hover:bg-green-500
+          text-white font-semibold rounded-md transition duration-300 tracking-wide
+        "
         onClick={handleClick}
         disabled={isLoading}
       >
         {isLoading ? "Analyzing..." : "Analyze"}
       </button>
 
-      {error && <p className="mt-2 text-red-400">{error}</p>}
+      {error && <p className="mt-3 text-red-500 font-medium">{error}</p>}
     </div>
   );
 };

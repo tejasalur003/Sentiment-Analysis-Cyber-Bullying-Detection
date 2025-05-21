@@ -1,4 +1,4 @@
-// components/SendEmail.tsx
+'use client';
 import React, { useState } from 'react';
 
 interface SendEmailProps {
@@ -16,6 +16,7 @@ const SendEmail: React.FC<SendEmailProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatus('');
 
     try {
       const response = await fetch('http://localhost:5000/send-email', {
@@ -36,22 +37,23 @@ const SendEmail: React.FC<SendEmailProps> = ({
       } else {
         setStatus(`❌ Failed: ${data.error}`);
       }
-    } catch (err) {
-      setStatus('⚠️ Error sending email');
+    } catch (error) {
+      setStatus('⚠️ Error sending email.');
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold text-orange-400 mb-4">Send Email Notification</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-4xl mx-auto mt-10 bg-black/60 p-6 rounded-lg shadow-lg border border-gray-700 backdrop-blur-md">
+      <h2 className="text-2xl font-bold text-orange-500 mb-6 text-center">Send Email Notification</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-white mb-1">Email</label>
+          <label className="block text-sm font-medium text-white mb-1">Recipient Email</label>
           <input
             type="email"
             value={receiverEmail}
             onChange={(e) => setReceiverEmail(e.target.value)}
-            className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
         </div>
@@ -61,15 +63,15 @@ const SendEmail: React.FC<SendEmailProps> = ({
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            rows={8}
-            className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            rows={10}
+            className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
         </div>
 
         <button
           type="submit"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold transition duration-200"
+          className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-md font-semibold transition duration-200"
         >
           Send Email
         </button>
