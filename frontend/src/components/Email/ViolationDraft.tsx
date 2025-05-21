@@ -24,7 +24,7 @@ const ViolationDraft: React.FC<ViolationDraftProps> = ({ violations }) => {
   const draft = `
 Dear User,
 
-We have reviewed recent activities linked to your account and detected content that violates our platform's community guidelines. Below are the details of the detected violations:
+We have reviewed recent activities linked to your account and detected content that violates our social media community guidelines. Below are the details of the detected violations:
 
 ${formattedViolations}
 
@@ -36,13 +36,10 @@ Thank you for your attention.
 
 Sincerely,  
 Community Trust Team
-  `.trim();
+`.trim();
 
-  return (
-    <pre className="bg-gray-700 p-4 rounded text-sm whitespace-pre-wrap border border-red-500">
-      {draft}
-    </pre>
-  );
+  // Return plain text (no JSX wrapping)
+  return <>{draft}</>;
 };
 
 export default ViolationDraft;

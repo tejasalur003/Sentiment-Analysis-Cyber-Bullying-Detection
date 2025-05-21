@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import { predictEmotion, EmotionScores } from "../api/EmotionPredict";
 
 const Emotion = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [text, setText] = useState<string>("");
-  const [emotionScores, setEmotionScores] = useState<EmotionScores | null>(null);
+  const [emotionScores, setEmotionScores] = useState<EmotionScores | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -30,10 +34,11 @@ const Emotion = () => {
 
     try {
       const data = await predictEmotion(text);
-      //console.log("Backend response:", data);
       setEmotionScores(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred.");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred."
+      );
       console.error("Error detecting emotion:", err);
     } finally {
       setIsLoading(false);
@@ -56,33 +61,44 @@ const Emotion = () => {
   const otherEmotions = getOtherEmotions();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-200 px-6">
-      <div className="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-2xl border border-gray-700">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-300">
+    <div className="min-h-screen text-white font-poppins flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-4xl p-10 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg text-left">
+        <h2 className="text-3xl font-semibold mb-6 tracking-wide text-center text-[#D9D9F1]">
           Emotion Analysis
         </h2>
 
-        <textarea
-          className="w-full h-40 p-4 bg-gray-700 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
-          placeholder="Enter text here..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        ></textarea>
+        <div className="mb-6 p-4 rounded-lg">
+          <textarea
+            className="w-full h-36 p-3 bg-gray-800 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 "
+            placeholder="Enter text here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+        </div>
 
         {error && (
-          <div className="mt-4 p-3 bg-red-500 text-white rounded-lg text-center">
+          <div className="mb-4 p-3 bg-red-600 text-white rounded-lg text-center">
             {error}
           </div>
         )}
 
         <Loader isLoading={isLoading} />
 
-        <div className="flex justify-center mt-4">
+        <div className="mb-6 flex justify-start gap-4">
+          <button
+            onClick={() => navigate("/analysis")}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition"
+          >
+            Back
+          </button>
+
           <button
             onClick={handleAnalyze}
             disabled={isLoading}
-            className={`px-6 py-2 text-white font-semibold rounded-lg transition-all ${
-              isLoading ? "bg-blue-500" : "bg-blue-600 hover:bg-blue-700"
+            className={`px-6 py-3 font-semibold rounded-md transition duration-200 ${
+              isLoading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {isLoading ? "Analyzing..." : "Analyze Emotion"}
@@ -90,16 +106,20 @@ const Emotion = () => {
         </div>
 
         {primaryEmotion && (
-          <div className="mt-6 p-4 bg-gray-700 rounded-lg border border-blue-500">
-            <h3 className="text-xl font-semibold mb-4 text-gray-300">Result:</h3>
-            <p className="text-gray-300">
+          <div className="p-6  bg-gray-800 rounded-lg border border-blue-600 text-[#D9D9F1]">
+            <h3 className="text-xl font-semibold mb-3">Result:</h3>
+            <p className="text-[#F0F0F7]">
               The most prominent emotion expressed in the text is{" "}
-              <span className="text-white font-bold">"{primaryEmotion[0]}"</span> with a confidence score of{" "}
-              <span className="font-bold">{primaryEmotion[1].toFixed(2)}%</span>.
+              <span className="font-bold">"{primaryEmotion[0]}"</span> with a
+              confidence score of{" "}
+              <span className="font-bold">
+                {(primaryEmotion[1]).toFixed(2)}%
+              </span>
+              .
             </p>
 
             {otherEmotions.length > 0 && (
-              <div className="mt-4">
+              <div className="mt-6">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   className="text-blue-400 hover:underline focus:outline-none"
@@ -108,14 +128,13 @@ const Emotion = () => {
                 </button>
 
                 {showDropdown && (
-                  <div className="mt-2 bg-gray-800 rounded-lg border border-gray-600 p-3 space-y-2">
+                  <div className="  rounded-lg p-4 space-y-2 text-[#D9D9F1]">
                     {otherEmotions.map(([emotion, score]) => (
-                      <div
-                        key={emotion}
-                        className="flex justify-between text-gray-300"
-                      >
+                      <div key={emotion} className="flex justify-between">
                         <span className="capitalize">"{emotion}"</span>
-                        <span className="font-bold">{score.toFixed(2)}%</span>
+                        <span className="font-bold">
+                          {(score).toFixed(2)}%
+                        </span>
                       </div>
                     ))}
                   </div>

@@ -1,8 +1,7 @@
-// src/components/LinkSection.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader";
-import { postScrape } from "../../api/PostScrape"; // ✅ Updated import
+import { postScrape } from "../../api/PostScrape";
 
 const LinkSection: React.FC = () => {
   const [url, setUrl] = useState<string>("");
@@ -22,13 +21,12 @@ const LinkSection: React.FC = () => {
       setError("Please enter a valid URL!");
       return;
     }
-
     setError(null);
     setIsLoading(true);
 
     try {
       const platform = detectPlatform(url);
-      const data = await postScrape(url); 
+      const data = await postScrape(url);
       const content = data.content || "";
 
       navigate("/extracted-text", {
@@ -46,10 +44,10 @@ const LinkSection: React.FC = () => {
   };
 
   return (
-    <div className="w-[80%] max-w-4xl p-12 bg-gray-900 text-gray-300 border border-gray-800 rounded-xl shadow-lg font-poppins mx-auto">
+    <div className="w-[90%] max-w-5xl mt-6 p-10 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg font-poppins mx-auto">
       <Loader isLoading={isLoading} />
 
-      <h2 className="text-xl font-semibold mb-3 text-gray-200 tracking-wide">
+      <h2 className="text-2xl font-semibold mb-4 text-gray-100 tracking-wide">
         Enter Social Media URL
       </h2>
 
@@ -58,17 +56,28 @@ const LinkSection: React.FC = () => {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Paste link here..."
-        className="p-3 text-white bg-gray-800 rounded w-full border border-gray-600 placeholder-gray-400 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-500 tracking-wide"
+        className="
+          w-full p-3 rounded-md 
+          bg-gray-800 border border-gray-600 
+          shadow-[0_2px_15px_rgba(129,140,248,0.15)]
+          placeholder-gray-400 text-white 
+          focus:outline-none focus:ring-2 focus:ring-white focus:border-white 
+          tracking-wide transition
+        "
       />
 
       <button
         onClick={handleScrape}
-        className="mt-4 px-5 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-lg transition duration-200"
+        className="
+          mt-5 px-6 py-2 bg-orange-600 hover:bg-orange-500
+          text-white font-semibold rounded-md transition duration-300 tracking-wide
+        "
+        disabled={isLoading}
       >
-        Fetch Content
+        {isLoading ? "Fetching..." : "Fetch Content"}
       </button>
 
-      {error && <p className="mt-2 text-red-400">{error}</p>}
+      {error && <p className="mt-3 text-red-500 font-medium">{error}</p>}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Navbar from "./components/Navbar.tsx";
+import Navbar from "./components/Navbar/Navbar.tsx";
 import Footer from "./components/Footer.tsx";
 import Home from "./pages/Home.tsx";
 // import SentimentAnalyzer from "./pages/SentimentAnalyzer.tsx";
@@ -11,11 +11,15 @@ import Emotion from "./pages/Emotion.tsx";
 import ExtractedText from "./pages/ExtractedText.tsx";
 import ProfileReview from "./pages/ProfileReview.tsx";
 import Mail from "./pages/Mail.tsx";
+import { AnimatedBackground } from "./components/AnimatedBackground.tsx";
+import StaticBackground from "./components/StaticBackground.tsx";
 
 function App() {
-  return (
+  return (    
     <Router>
       <Navbar />
+      {/* <AnimatedBackground /> */}
+      <StaticBackground/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/extracted-text" element={<ExtractedText />} />
@@ -26,7 +30,6 @@ function App() {
         <Route path="/emotion-analysis" element={<Emotion/>} />
         <Route path="/profile-review" element={<ProfileReview/>} />
         <Route path="/send-email" element={<Mail/>} />
-
 
       </Routes>
       <Footer />
