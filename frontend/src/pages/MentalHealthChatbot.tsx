@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import MessageBubble from '../components/Chatbot/MessageBubble';
 import UserInput from '../components/Chatbot/UserInput';
@@ -45,6 +45,8 @@ const MentalHealthChatbot: React.FC = () => {
   const [activeCategories, setActiveCategories] = useState<Category[]>([]);
   const [chatFinished, setChatFinished] = useState(false);
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   const categoryMap: { [key in Category]: string[] } = {
     depression: depressionQuestions,
     harassment: harassmentQuestions,
@@ -53,7 +55,6 @@ const MentalHealthChatbot: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log('Received results in chatbot:', results);
     detectCategories();
   }, []);
 
@@ -63,6 +64,13 @@ const MentalHealthChatbot: React.FC = () => {
       addBotMessage(first);
     }
   }, [activeCategories]);
+
+  // Scroll only the chat container when new messages are added
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const detectCategories = () => {
     const categories: Category[] = [];
@@ -84,9 +92,8 @@ const MentalHealthChatbot: React.FC = () => {
       }
     });
 
-    // If no results triggered anything, use neutral context
     if (categories.length === 0) {
-      categories.push('frustration'); // Neutral fallback
+      categories.push('frustration');
     }
 
     setActiveCategories(categories);
@@ -104,7 +111,6 @@ const MentalHealthChatbot: React.FC = () => {
     setResponses((prev) => [...prev, userText]);
     setInput('');
 
-    // Check for critical signs
     if (userText.toLowerCase().includes('suicidal') || userText.toLowerCase().includes('self-harm')) {
       addBotMessage('If you’re in danger or feeling suicidal, please contact 988 (Suicide & Crisis Lifeline) immediately.');
     }
@@ -125,7 +131,7 @@ const MentalHealthChatbot: React.FC = () => {
       }, 800);
     } else {
       setTimeout(() => {
-        addBotMessage('Thank you for sharing. Based on your responses and any social media signals, we recommend seeking support if needed.');
+        addBotMessage('Thank you for sharing. Based on your responses and social media input, we recommend seeking professional support.');
         addBotMessage('Helpful resources:\n- Suicide Helpline: 988\n- MentalHealth.gov\n- NAMI.org');
         setChatFinished(true);
       }, 1000);
@@ -133,16 +139,29 @@ const MentalHealthChatbot: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-2xl font-bold mb-4">Mental Health Chatbot</h1>
-      <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-        {messages.map((msg, idx) => (
-          <MessageBubble key={idx} role={msg.role} message={msg.text} />
-        ))}
-      </div>
-      {!chatFinished && <UserInput value={input} onChange={setInput} onSend={handleSend} />}
-    </div>
-  );
+    <div className="w-[90%] max-w-4xl mx-auto my-24 p-6 md:p-8 bg-gray-900 border border-gray-700 rounded-lg shadow-md font-poppins">
+  <h2 className="text-2xl font-semibold mb-6 text-white">
+    🧠 Mental Health Chatbot
+  </h2>
+
+  {/* Chat Messages Container */}
+  <div
+    ref={chatContainerRef}
+    className="w-full max-h-[400px] min-h-[200px] overflow-y-auto p-4 rounded-md text-white scrollbar-thin scrollbar-thumb-gray-600"
+  >
+    {messages.map((msg, idx) => (
+      <MessageBubble key={idx} role={msg.role} message={msg.text} />
+    ))}
+  </div>
+
+  {/* Input box */}
+  {!chatFinished && (
+      <UserInput value={input} onChange={setInput} onSend={handleSend} />
+  )}
+</div>
+
+);
+
 };
 
 export default MentalHealthChatbot;
