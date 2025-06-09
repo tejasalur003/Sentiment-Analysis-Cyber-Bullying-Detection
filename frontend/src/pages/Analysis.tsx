@@ -57,7 +57,7 @@ const Analysis: React.FC = () => {
 
       {/* Score */}
       <span className="font-semibold text-lg text-gray-300">Score:</span>
-      <p className="text-gray-400 text-lg font-semibold text-white">
+      <p className="text-gray-400 text-lg font-semibold">
         {score !== undefined ? score.toFixed(2) : "N/A"}
       </p>
     </div>

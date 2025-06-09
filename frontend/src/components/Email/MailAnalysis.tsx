@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SendEmail from './SendMail';
 import ViolationDraft from './ViolationDraft';
 import WarningDraft from './WarningDraft';
@@ -39,6 +39,7 @@ const mildViolations = {
 
 const MailAnalysis: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { results } = location.state as { results: TweetAnalysisResult[] };
 
   const getViolationType = (
@@ -94,6 +95,12 @@ const MailAnalysis: React.FC = () => {
     }
   };
 
+  const handleChatbotStart = () => {
+    navigate('/mental-health-support', {
+      state: { results }
+    });
+  };
+
   return (
     <div className="p-28 text-white min-h-screen">
       <h2 className="text-2xl font-bold mb-6 text-white">Summary</h2>
@@ -127,11 +134,19 @@ const MailAnalysis: React.FC = () => {
             ))}
           </ul>
 
-            <SendEmail
-              defaultEmail="username@gmail.com"
-              defaultMessage={getEmailMessage()}
-            />
-         
+          <SendEmail
+            defaultEmail="username@gmail.com"
+            defaultMessage={getEmailMessage()}
+          />
+
+          <div className="mt-10">
+            <button
+              onClick={handleChatbotStart}
+              className="bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700 transition"
+            >
+              Mental-Health Chatbot
+            </button>
+          </div>
         </>
       )}
     </div>
