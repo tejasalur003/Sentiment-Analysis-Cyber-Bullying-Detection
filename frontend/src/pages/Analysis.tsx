@@ -90,7 +90,7 @@ const Analysis: React.FC = () => {
       </button>
 
       <button
-        className="px-6 py-3 bg-orange-400 hover:bg-yellow-500 text-white font-semibold text-lg rounded-md transition duration-200"
+        className="px-6 py-3 bg-red-600 hover:bg-red-400 text-white font-semibold text-lg rounded-md transition duration-200"
         onClick={() => navigate("/cyberbullying-check", { state: { text, sentiment, score } })}
       >
         Check for Cyberbullying
