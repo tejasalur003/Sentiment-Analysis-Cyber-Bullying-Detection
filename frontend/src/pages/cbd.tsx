@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
-import { predictCyberbullying } from "../api/CBDPredict";
+import { predictCyberbullyingAll, CyberbullyingPrediction } from "../api/CBDPredict";
 
 const Cbd = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [text, setText] = useState<string>("");
-  const [prediction, setPrediction] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<CyberbullyingPrediction | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,7 +36,7 @@ const Cbd = () => {
     setPrediction(null);
 
     try {
-      const result = await predictCyberbullying(text);
+      const result = await predictCyberbullyingAll(text);
       setPrediction(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred.");
@@ -73,10 +73,14 @@ const Cbd = () => {
 
         <Loader isLoading={isLoading} />
 
-        {/* Button group aligned to the left */}
         <div className="flex gap-4 mt-4">
           <button
-            onClick={() => navigate("/analysis")}
+            onClick={() => navigate("/analysis", {
+              state: {
+                ...location.state,
+                text,
+              },
+            })}
             className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition"
           >
             Back
@@ -95,14 +99,28 @@ const Cbd = () => {
 
         {prediction && (
           <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-gray-600">
-            <h3 className="text-lg font-semibold mb-1 text-gray-300">Prediction:</h3>
+            <h3 className="text-lg font-semibold mb-2 text-gray-300">Prediction:</h3>
             <p
               className={`text-base font-bold ${
-                prediction === "not_cyberbullying" ? "text-green-400" : "text-red-400"
+                prediction.predicted_class === "not_cyberbullying"
+                  ? "text-green-400"
+                  : "text-red-400"
               }`}
             >
-              {prediction.replace("_", " ")}
+              {prediction.predicted_class.replaceAll("_", " ")} (
+              {(prediction.confidence * 100).toFixed(2)}% confidence)
             </p>
+
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-400 mb-1">Category Probabilities:</h4>
+              <ul className="text-sm text-gray-300 list-disc list-inside space-y-1">
+                {Object.entries(prediction.probabilities).map(([label, prob]) => (
+                  <li key={label}>
+                    {label.replaceAll("_", " ")}: {(prob * 100).toFixed(2)}%
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
       </div>
