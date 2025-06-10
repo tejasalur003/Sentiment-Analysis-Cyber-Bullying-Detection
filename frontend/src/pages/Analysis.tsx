@@ -57,7 +57,7 @@ const Analysis: React.FC = () => {
 
       {/* Score */}
       <span className="font-semibold text-lg text-gray-300">Score:</span>
-      <p className="text-gray-400 text-lg font-semibold text-white">
+      <p className="text-gray-400 text-lg font-semibold">
         {score !== undefined ? score.toFixed(2) : "N/A"}
       </p>
     </div>
@@ -76,7 +76,7 @@ const Analysis: React.FC = () => {
     {/* Buttons */}
     <div className="mt-10 flex gap-4 justify-center">
       <button
-        className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white font-semibold text-lg rounded-md transition duration-200"
+        className="px-6 py-3 bg-green-600 hover:bg-green-400 text-white font-semibold text-lg rounded-md transition duration-200"
         onClick={() => navigate("/")}
       >
         Analyze Another Text
@@ -84,14 +84,14 @@ const Analysis: React.FC = () => {
 
       <button
         className="px-6 py-2 bg-blue-500 hover:bg-blue-700 text-white font-semibold text-lg rounded-md transition duration-200"
-        onClick={() => navigate("/emotion-analysis", { state: { text } })}
+        onClick={() => navigate("/emotion-analysis", { state:{ text, sentiment, score }})}
       >
         Emotion Analysis
       </button>
 
       <button
-        className="px-6 py-3 bg-yellow-600 hover:bg-yellow-500 text-white font-semibold text-lg rounded-md transition duration-200"
-        onClick={() => navigate("/cyberbullying-check", { state: { text } })}
+        className="px-6 py-3 bg-red-600 hover:bg-red-400 text-white font-semibold text-lg rounded-md transition duration-200"
+        onClick={() => navigate("/cyberbullying-check", { state: { text, sentiment, score } })}
       >
         Check for Cyberbullying
       </button>

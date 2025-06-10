@@ -59,22 +59,22 @@ def predict_cyberbullying(text):
 #     return text
 
 # Define prediction function
-# def predict_cyberbullying(text):
-#     preprocessed_text = preprocess_text(text)
-#     sequence = tokenizer.texts_to_sequences([preprocessed_text])
-#     padded_sequence = pad_sequences(sequence, maxlen=100, padding="post", truncating="post")
+def predict_cyberbullying_all(text):
+    preprocessed_text = preprocess_text(text)
+    sequence = tokenizer.texts_to_sequences([preprocessed_text])
+    padded_sequence = pad_sequences(sequence, maxlen=100, padding="post", truncating="post")
 
-#     predictions = model.predict(padded_sequence)[0]  # Get probabilities
-#     predicted_class_index = np.argmax(predictions)  # Get highest probability class
-#     predicted_category = label_mapping[predicted_class_index]  # Get category name
-#     confidence_score = float(predictions[predicted_class_index])  # Confidence of prediction
+    predictions = model.predict(padded_sequence)[0]  # Get probabilities
+    predicted_class_index = np.argmax(predictions)  # Get highest probability class
+    predicted_category = label_mapping[predicted_class_index]  # Get category name
+    confidence_score = float(predictions[predicted_class_index])  # Confidence of prediction
 
-#     # Convert probabilities into a dictionary
-#     category_probabilities = {label_mapping[i]: float(predictions[i]) for i in range(len(predictions))}
+    # Convert probabilities into a dictionary
+    category_probabilities = {label_mapping[i]: float(predictions[i]) for i in range(len(predictions))}
 
-#     return {
-#         "text": text,
-#         "predicted_class": predicted_category,
-#         "confidence": confidence_score,
-#         "probabilities": category_probabilities,
-#     }
+    return {
+        "text": text,
+        "predicted_class": predicted_category,
+        "confidence": confidence_score,
+        "probabilities": category_probabilities,
+    }

@@ -10,6 +10,7 @@ from Models.model import predict_sentiment
 # from WebScraper.scraper import extract_tweet_text
 from WebScraper.scraper import scrape_content
 from Models.cbd_predict import predict_cyberbullying
+from Models.cbd_predict import predict_cyberbullying_all
 from Models.emotion_predict import predict_emotion_detailed
 from WebScraper.profile_scrapper import get_latest_tweets
 
@@ -81,7 +82,23 @@ def cbd_predict():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/cbd_predict_all', methods=['POST'])
+def cbd_predict_all():
+    try:
+        data = request.get_json()
+        text = data.get("text", "")
+        
+        if not text:
+            return jsonify({"error": "No input text provided"}), 400
+        
+        prediction = predict_cyberbullying_all(text)
+        
+        return jsonify({"prediction": prediction})
     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/predict-emotion', methods=['POST'])
 def predict_emotion():

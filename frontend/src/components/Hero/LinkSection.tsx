@@ -69,7 +69,7 @@ const LinkSection: React.FC = () => {
       <button
         onClick={handleScrape}
         className="
-          mt-5 px-6 py-2 bg-orange-600 hover:bg-orange-500
+          mt-5 px-6 py-2 bg-orange-500 hover:bg-orange-600
           text-white font-semibold rounded-md transition duration-300 tracking-wide
         "
         disabled={isLoading}

@@ -86,7 +86,14 @@ const Emotion = () => {
 
         <div className="mb-6 flex justify-start gap-4">
           <button
-            onClick={() => navigate("/analysis")}
+            onClick={() =>
+              navigate("/analysis", {
+                state: {
+                  ...location.state,
+                  text,
+                },
+              })
+            }
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md transition"
           >
             Back
@@ -112,9 +119,7 @@ const Emotion = () => {
               The most prominent emotion expressed in the text is{" "}
               <span className="font-bold">"{primaryEmotion[0]}"</span> with a
               confidence score of{" "}
-              <span className="font-bold">
-                {(primaryEmotion[1]).toFixed(2)}%
-              </span>
+              <span className="font-bold">{primaryEmotion[1].toFixed(2)}%</span>
               .
             </p>
 
@@ -132,9 +137,7 @@ const Emotion = () => {
                     {otherEmotions.map(([emotion, score]) => (
                       <div key={emotion} className="flex justify-between">
                         <span className="capitalize">"{emotion}"</span>
-                        <span className="font-bold">
-                          {(score).toFixed(2)}%
-                        </span>
+                        <span className="font-bold">{score.toFixed(2)}%</span>
                       </div>
                     ))}
                   </div>

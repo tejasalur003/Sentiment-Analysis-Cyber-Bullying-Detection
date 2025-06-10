@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { predictSentiment } from "../../api/SentimentPredict";
 import { postScrape } from "../../api/PostScrape";
 import { predictCyberbullying } from "../../api/CBDPredict";
 import { predictEmotion } from "../../api/EmotionPredict";
+import Loader2 from "./loader2";
 
 interface ProfileReviewResultsProps {
   tweetLinks: string[];
@@ -24,11 +25,29 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<(TweetAnalysisResult | null)[]>(Array(tweetLinks.length).fill(null));
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const timerRef = useRef<number | null>(null);
 
-  if (tweetLinks.length === 0) return null;
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   const generateResult = async () => {
     setIsLoading(true);
+    let remaining = tweetLinks.length;
+    setTimeRemaining(remaining * 18);
+
+    timerRef.current = window.setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     for (let i = 0; i < tweetLinks.length; i++) {
       setCurrentIndex(i);
@@ -61,15 +80,18 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
       } catch (err) {
         console.error(`Failed to analyze tweet ${i + 1}:`, err);
       }
+
+      remaining--;
+      setTimeRemaining(remaining * 18);
     }
 
     setCurrentIndex(null);
     setIsLoading(false);
+    if (timerRef.current) clearInterval(timerRef.current);
   };
 
   const analyzeResults = () => {
     const validResults = results.filter(r => r !== null) as TweetAnalysisResult[];
-
     if (validResults.length > 0) {
       navigate("/send-email", { state: { results: validResults } });
     } else {
@@ -77,13 +99,17 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
     }
   };
 
+  if (tweetLinks.length === 0) return null;
+
   return (
-    <div className="w-[85%] max-w-5xl mx-auto mb-24 p-8 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg">
+    <div className="w-[85%] max-w-5xl mx-auto mb-24 p-8 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg relative">
+      {isLoading && <Loader2 timeRemaining={timeRemaining} />}
+
       <h2 className="text-2xl font-bold mb-6 text-orange-400">Tweet Analysis Table</h2>
 
       <div className="overflow-x-auto rounded-xl border border-gray-700">
         <table className="min-w-full bg-gray-800 table-auto text-sm">
-          <thead className=" text-gray-300 uppercase">
+          <thead className="text-gray-300 uppercase">
             <tr>
               <th className="px-6 py-3 border-b border-gray-600 text-left">Link</th>
               <th className="px-6 py-3 border-b border-gray-600 text-left">Sentiment</th>
@@ -111,10 +137,14 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
                       : "—"}
                   </td>
                   <td className="px-6 py-4 border-t border-gray-700 text-gray-300">
-                    {result ? `${result.emotion} (${result.emotionScore.toFixed(2)}%)` : "—"}
+                    {isAnalyzing
+                      ? "Processing..."
+                      : result
+                      ? `${result.emotion} (${(result.emotionScore).toFixed(2)}%)`
+                      : "—"}
                   </td>
                   <td className="px-6 py-4 border-t border-gray-700 text-gray-300">
-                    {result ? result.cbd : "—"}
+                    {isAnalyzing ? "Checking..." : result ? result.cbd : "—"}
                   </td>
                 </tr>
               );
@@ -123,26 +153,19 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
         </table>
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-8">
+      <div className="mt-6 flex gap-4">
         <button
+          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-all"
           onClick={generateResult}
           disabled={isLoading}
-          className={`px-6 py-2 rounded-lg font-semibold transition duration-200 ${
-            isLoading
-              ? "bg-orange-300 cursor-not-allowed text-white"
-              : "bg-orange-500 hover:bg-orange-400 text-white"
-          }`}
         >
-          {isLoading
-            ? currentIndex !== null
-              ? `Analyzing (${currentIndex + 1}/${tweetLinks.length})...`
-              : "Analyzing..."
-            : "Analyze Tweets"}
+          {isLoading ? "Analyzing..." : "Start Analysis"}
         </button>
 
         <button
+          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all"
           onClick={analyzeResults}
-          className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition duration-200"
+          disabled={isLoading}
         >
           Analyze Results
         </button>

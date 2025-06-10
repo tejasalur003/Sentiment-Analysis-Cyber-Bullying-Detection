@@ -19,20 +19,16 @@ const Footer = () => {
       "
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-
         {/* Column 1: Info */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-slate-100">
-            Sentiment Analysis
-          </h2>
+          <div className="text-lg sm:text-xl font-semibold tracking-wide text-orange-400 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]">
+            Sentiment
+            <span className="text-slate-100 ">AI</span>
+          </div>
           <ul className="mt-3 space-y-2 text-sm sm:text-base">
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
-              About Us
-            </li>
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
-              Privacy Policy
-            </li>
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
+            <li className="text-slate-100 cursor-pointer">About Us</li>
+            <li className="text-slate-100 cursor-pointer">Privacy Policy</li>
+            <li className="text-slate-100 cursor-pointer">
               Terms & Conditions
             </li>
           </ul>
@@ -40,39 +36,37 @@ const Footer = () => {
 
         {/* Column 2: Features */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-slate-100">
+          <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-orange-400 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]">
             Features
           </h2>
           <ul className="mt-3 space-y-2 text-sm sm:text-base">
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
+            <li className="text-slate-100 cursor-pointer">
               Real-time Analysis
             </li>
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
+            <li className="text-slate-100 cursor-pointer">
               Cyberbullying Detection
             </li>
-            <li className="hover:text-pink-400 cursor-pointer transition-colors duration-300">
-              API Integration
-            </li>
+            <li className="text-slate-100 cursor-pointer">API Integration</li>
           </ul>
         </div>
 
         {/* Column 3: Social Media */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-slate-100">
+          <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-orange-400 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]">
             Content Sources
           </h2>
           <div className="flex space-x-4 mt-3 text-xl">
-            <FaFacebookF className="hover:text-pink-400 transition-colors duration-300 cursor-pointer" />
-            <FaTwitter className="hover:text-pink-400 transition-colors duration-300 cursor-pointer" />
-            <FaInstagram className="hover:text-pink-400 transition-colors duration-300 cursor-pointer" />
-            <FaYoutube className="hover:text-pink-400 transition-colors duration-300 cursor-pointer" />
-            <FaTiktok className="hover:text-pink-400 transition-colors duration-300 cursor-pointer" />
+            <FaFacebookF className="text-slate-100 cursor-pointer" />
+            <FaTwitter className="text-slate-100 cursor-pointer" />
+            <FaInstagram className="text-slate-100 cursor-pointer" />
+            <FaYoutube className="text-slate-100 cursor-pointer" />
+            <FaTiktok className="text-slate-100 cursor-pointer" />
           </div>
         </div>
       </div>
 
       <div className="mt-10 text-center text-sm text-slate-400 tracking-wide">
-        © {new Date().getFullYear()} Sentiment Analysis. All rights reserved.
+        © {new Date().getFullYear()} SentimentAI. All rights reserved.
       </div>
     </footer>
   );

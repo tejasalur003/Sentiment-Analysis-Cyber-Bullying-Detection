@@ -13,6 +13,7 @@ import ProfileReview from "./pages/ProfileReview.tsx";
 import Mail from "./pages/Mail.tsx";
 import { AnimatedBackground } from "./components/AnimatedBackground.tsx";
 import StaticBackground from "./components/StaticBackground.tsx";
+import MentalHealthChatbot from "./pages/MentalHealthChatbot.tsx";
 
 function App() {
   return (    
@@ -30,7 +31,7 @@ function App() {
         <Route path="/emotion-analysis" element={<Emotion/>} />
         <Route path="/profile-review" element={<ProfileReview/>} />
         <Route path="/send-email" element={<Mail/>} />
-
+        <Route path="/mental-health-support" element={<MentalHealthChatbot/>}/>
       </Routes>
       <Footer />
     </Router>

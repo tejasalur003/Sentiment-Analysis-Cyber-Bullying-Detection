@@ -1,10 +1,16 @@
 import React, { useMemo } from "react";
 
+interface ShimmerDot {
+  size: number;
+  top: number;
+  left: number;
+}
+
 const StaticBackground = () => {
   // Generate shimmer dots only once
-  const shimmerDots = useMemo(() => {
+  const shimmerDots = useMemo<ShimmerDot[]>(() => {
     const count = 100; // Number of dots
-    const dots = [];
+    const dots: ShimmerDot[] = [];
 
     for (let i = 0; i < count; i++) {
       const size = Math.floor(Math.random() * 3) + 2; // 2px to 4px
@@ -25,19 +31,39 @@ const StaticBackground = () => {
       {/* Static glowing blobs */}
       <div
         className="absolute w-[200px] h-[200px] rounded-full opacity-40 blur-3xl"
-        style={{ top: "10%", left: "15%", background: "radial-gradient(circle, rgba(255,115,179,0.25), transparent 70%)" }}
+        style={{
+          top: "10%",
+          left: "15%",
+          background:
+            "radial-gradient(circle, rgba(255,115,179,0.25), transparent 70%)",
+        }}
       />
       <div
         className="absolute w-[250px] h-[250px] rounded-full opacity-40 blur-3xl"
-        style={{ top: "40%", left: "60%", background: "radial-gradient(circle, rgba(129,140,248,0.25), transparent 70%)" }}
+        style={{
+          top: "40%",
+          left: "60%",
+          background:
+            "radial-gradient(circle, rgba(129,140,248,0.25), transparent 70%)",
+        }}
       />
       <div
         className="absolute w-[180px] h-[180px] rounded-full opacity-40 blur-3xl"
-        style={{ bottom: "15%", right: "20%", background: "radial-gradient(circle, rgba(255,115,179,0.25), transparent 70%)" }}
+        style={{
+          bottom: "15%",
+          right: "20%",
+          background:
+            "radial-gradient(circle, rgba(255,115,179,0.25), transparent 70%)",
+        }}
       />
       <div
         className="absolute w-[220px] h-[220px] rounded-full opacity-40 blur-3xl"
-        style={{ bottom: "20%", left: "10%", background: "radial-gradient(circle, rgba(129,140,248,0.25), transparent 70%)" }}
+        style={{
+          bottom: "20%",
+          left: "10%",
+          background:
+            "radial-gradient(circle, rgba(129,140,248,0.25), transparent 70%)",
+        }}
       />
 
       {/* Static shimmer dots (randomized once) */}
