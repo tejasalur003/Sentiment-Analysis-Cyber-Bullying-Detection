@@ -36,8 +36,7 @@ const TextSection: React.FC = () => {
   };
 
   return (
-    <div className="w-[90%] max-w-5xl p-10 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg font-poppins mx-auto">
-
+    <div className="w-[90%] max-w-5xl mt-6 p-10 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg font-poppins mx-auto">
       <Loader isLoading={isLoading} />
 
       <h2 className="text-2xl font-semibold mb-4 text-gray-100 tracking-wide">
@@ -45,7 +44,7 @@ const TextSection: React.FC = () => {
       </h2>
 
       <textarea
-  className="
+        className="
     w-full h-48 md:h-64 p-3 rounded-md 
     bg-gray-800 border border-gray-600 
     shadow-[0_2px_15px_rgba(129,140,248,0.15)]
@@ -53,12 +52,10 @@ const TextSection: React.FC = () => {
     focus:outline-none focus:ring-2 focus:ring-white focus:border-white 
     tracking-wide transition
   "
-  placeholder="Enter text..."
-  value={text}
-  onChange={(e) => setText(e.target.value)}
-/>
-
-
+        placeholder="Enter text..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
 
       <button
         className="

@@ -10,9 +10,9 @@ const NavItem: React.FC<NavItemProps> = ({ title, href }) => (
     href={href}
     className="
       text-slate-100
-      hover:text-pink-400
+      hover:text-orange-400
       font-medium tracking-wide
-      transition-colors duration-300
+      transition-colors duration-100
       px-3 py-2 rounded-md
     "
   >
