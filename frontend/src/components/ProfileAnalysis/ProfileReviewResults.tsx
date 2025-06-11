@@ -37,7 +37,7 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
   const generateResult = async () => {
     setIsLoading(true);
     let remaining = tweetLinks.length;
-    setTimeRemaining(remaining * 18);
+    setTimeRemaining(remaining * 20);
 
     timerRef.current = window.setInterval(() => {
       setTimeRemaining(prev => {
@@ -82,7 +82,7 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
       }
 
       remaining--;
-      setTimeRemaining(remaining * 18);
+      setTimeRemaining(remaining * 20);
     }
 
     setCurrentIndex(null);

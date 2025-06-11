@@ -35,7 +35,7 @@ We urge you to revisit our Community Guidelines and make the necessary adjustmen
 Thank you for your attention.
 
 Sincerely,  
-Community Trust Team
+SentimentAI Team
 `.trim();
 
   // Return plain text (no JSX wrapping)

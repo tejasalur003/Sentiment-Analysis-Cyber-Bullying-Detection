@@ -31,7 +31,7 @@ ${formatted}
 Please aim to communicate respectfully and avoid content that may be perceived as inappropriate. We appreciate your effort in maintaining a safe and inclusive environment.
 
 Best regards,  
-Community Support Team
+SentimentAI Team
 `.trim();
 
   return (
