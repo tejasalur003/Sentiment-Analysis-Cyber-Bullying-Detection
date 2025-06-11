@@ -12,7 +12,7 @@ const Loader2: React.FC<Loader2Props> = ({ timeRemaining }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
       <div className="relative w-36 h-36">
         {/* Spinning border */}
-        <div className="absolute inset-0 border-8 border-t-transparent border-orange-400 rounded-full animate-spin" />
+        <div className="absolute inset-0 border-5 border-t-transparent border-orange-400 rounded-full animate-spin" />
 
         {/* Stationary countdown text */}
         <div className={`absolute inset-0 flex items-center justify-center text-white font-semibold ${

@@ -1,11 +1,12 @@
-'use client';
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import SendEmail from './SendMail';
-import ViolationDraft from './ViolationDraft';
-import WarningDraft from './WarningDraft';
-import SafeDraft from './SafeDraft';
-import { renderToStaticMarkup } from 'react-dom/server';
+"use client";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import SendEmail from "./SendMail";
+import ViolationDraft from "./ViolationDraft";
+import WarningDraft from "./WarningDraft";
+import SafeDraft from "./SafeDraft";
+import { renderToStaticMarkup } from "react-dom/server";
+import SummaryCard from "./SummaryCard";
 
 interface TweetAnalysisResult {
   link: string;
@@ -20,137 +21,112 @@ interface TweetAnalysisResult {
 interface ViolationDetail {
   link: string;
   violations: {
-    parameter: 'Sentiment' | 'Emotion' | 'Cyberbullying';
+    parameter: "Sentiment" | "Emotion" | "Cyberbullying";
     value: string;
   }[];
 }
 
-const hardViolations = {
-  sentiment: ['Very Negative'],
-  emotion: ['Anger', 'Fear'],
-  cbd: ['cyberbullying', 'hate', 'insult', 'threat'],
-};
-
-const mildViolations = {
-  sentiment: ['Slightly Negative'],
-  emotion: ['Sadness'],
-  cbd: ['not_cyberbullying'],
-};
+const violatingSentiments = ["Very Negative", "Slightly Negative"];
+const violatingEmotions = ["Anger", "Fear", "Sadness"];
+const violatingCBD = ["religion", "age", "ethnicity", "gender"];
 
 const MailAnalysis: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { results } = location.state as { results: TweetAnalysisResult[] };
 
-  const getViolationType = (
-    result: TweetAnalysisResult
-  ): { type: 'hard' | 'mild' | null; detail: ViolationDetail | null } => {
-    const violations: ViolationDetail['violations'] = [];
-    let type: 'hard' | 'mild' | null = null;
+  const getViolations = (result: TweetAnalysisResult): ViolationDetail | null => {
+    const violations: ViolationDetail["violations"] = [];
 
-    if (hardViolations.sentiment.includes(result.sentiment)) {
-      violations.push({ parameter: 'Sentiment', value: result.sentiment });
-      type = 'hard';
-    } else if (mildViolations.sentiment.includes(result.sentiment)) {
-      violations.push({ parameter: 'Sentiment', value: result.sentiment });
-      type = type === 'hard' ? 'hard' : 'mild';
+    if (violatingSentiments.includes(result.sentiment)) {
+      violations.push({ parameter: "Sentiment", value: result.sentiment });
     }
 
-    if (hardViolations.emotion.includes(result.emotion)) {
-      violations.push({ parameter: 'Emotion', value: result.emotion });
-      type = 'hard';
-    } else if (mildViolations.emotion.includes(result.emotion)) {
-      violations.push({ parameter: 'Emotion', value: result.emotion });
-      type = type === 'hard' ? 'hard' : 'mild';
+    if (violatingEmotions.includes(result.emotion)) {
+      violations.push({ parameter: "Emotion", value: result.emotion });
     }
 
-    if (hardViolations.cbd.includes(result.cbd)) {
-      violations.push({ parameter: 'Cyberbullying', value: result.cbd });
-      type = 'hard';
+    if (violatingCBD.includes(result.cbd)) {
+      violations.push({ parameter: "Cyberbullying", value: result.cbd });
     }
 
-    return violations.length
-      ? { type, detail: { link: result.link, violations } }
-      : { type: null, detail: null };
+    return violations.length > 0 ? { link: result.link, violations } : null;
   };
 
-  const hardViolationsList: ViolationDetail[] = [];
-  const mildViolationsList: ViolationDetail[] = [];
+  const violationDetails: ViolationDetail[] = [];
 
   results.forEach((result) => {
-    const { type, detail } = getViolationType(result);
+    const detail = getViolations(result);
     if (detail) {
-      if (type === 'hard') hardViolationsList.push(detail);
-      else if (type === 'mild') mildViolationsList.push(detail);
+      violationDetails.push(detail);
     }
   });
 
-  const getEmailMessage = (): string => {
-    if (hardViolationsList.length > 0) {
-      return renderToStaticMarkup(<ViolationDraft violations={hardViolationsList} />);
-    } else if (mildViolationsList.length > 0) {
-      return renderToStaticMarkup(<WarningDraft violations={mildViolationsList} />);
-    } else {
-      return renderToStaticMarkup(<SafeDraft />);
-    }
-  };
+  // Determine final classification:
+  let emailMessage = "";
+
+  if (violationDetails.length === 0) {
+    // No tweets in violation
+    emailMessage = renderToStaticMarkup(<SafeDraft />);
+  } else if (violationDetails.length === results.length) {
+    // All tweets are in violation
+    emailMessage = renderToStaticMarkup(
+      <ViolationDraft violations={violationDetails} />
+    );
+  } else {
+    // Some tweets are in violation
+    emailMessage = renderToStaticMarkup(
+      <WarningDraft violations={violationDetails} />
+    );
+  }
 
   const handleChatbotStart = () => {
-    navigate('/mental-health-support', {
-      state: { results }
+    navigate("/mental-health-support", {
+      state: { results },
     });
   };
 
   return (
-    <div className="p-28 text-white min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-white">Summary</h2>
+  <div className="p-28 text-white min-h-screen">
+    {results.length === 0 ? (
+      <p>No data found.</p>
+    ) : (
+      <>
+        <h2 className="text-2xl font-bold mb-6 text-white">Summary</h2>
 
-      {results.length === 0 ? (
-        <p>No data found.</p>
-      ) : (
-        <>
-          <ul className="space-y-4 mb-8">
-            {results.map((res, index) => (
-              <li key={index} className="p-6 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg">
-                <p>
-                  <strong>Link:</strong>{' '}
-                  <a href={res.link} className="text-blue-400 underline hover:text-gray-200 transition">
-                    {res.link}
-                  </a>
-                </p>
-                <p>
-                  <strong>Sentiment:</strong> {res.sentiment} ({res.score.toFixed(2)})
-                </p>
-                <p>
-                  <strong>Emotion:</strong> {res.emotion} ({res.emotionScore.toFixed(2)}%)
-                </p>
-                <p>
-                  <strong>Cyberbullying:</strong> {res.cbd}
-                </p>
-                <p>
-                  <strong>Text:</strong> {res.text}
-                </p>
-              </li>
-            ))}
-          </ul>
+        <ul className="space-y-4 mb-8">
+          {results.map((res, index) => (
+            <SummaryCard
+              key={index}
+              link={res.link}
+              sentiment={res.sentiment}
+              score={res.score}
+              emotion={res.emotion}
+              emotionScore={res.emotionScore}
+              cbd={res.cbd}
+              text={res.text}
+            />
+          ))}
+        </ul>
 
-          <SendEmail
-            defaultEmail="username@gmail.com"
-            defaultMessage={getEmailMessage()}
-          />
+        <SendEmail
+          defaultEmail="username@gmail.com"
+          defaultMessage={emailMessage}
+        />
 
-          <div className="mt-10">
-            <button
-              onClick={handleChatbotStart}
-              className="bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700 transition"
-            >
-              Mental-Health Chatbot
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
+        <div className="mt-30 flex justify-begin ">
+          <button
+            onClick={handleChatbotStart}
+            className="bg-blue-600 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-lg shadow-md transition duration-200"
+          >
+            Mental-Health Support
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+);
+
 };
 
 export default MailAnalysis;
