@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import MessageBubble from '../components/Chatbot/MessageBubble';
-import UserInput from '../components/Chatbot/UserInput';
-
-import depressionQuestions from '../components/Chatbot/questions/depressionQuestions';
-import harassmentQuestions from '../components/Chatbot/questions/harassmentQuestions';
-import anxietyQuestions from '../components/Chatbot/questions/anxietyQuestions';
-import frustrationQuestions from '../components/Chatbot/questions/frustrationQuestions';
+import questions, { MentalHealthQuestion } from "../components/Chatbot/questions/QuestionBank";
+import AssessmentReport from '../components/Chatbot/AssesmentReprot';
 
 interface TweetAnalysisResult {
   link: string;
@@ -18,150 +14,151 @@ interface TweetAnalysisResult {
   cbd: string;
 }
 
-type Category = 'depression' | 'harassment' | 'anxiety' | 'frustration';
-
-const defaultResult: TweetAnalysisResult[] = [
-  {
-    link: '',
-    text: 'This is a sample neutral tweet.',
-    sentiment: 'Neutral',
-    score: 0.5,
-    emotion: 'Joy',
-    emotionScore: 0.5,
-    cbd: 'not_cyberbullying',
-  },
-];
-
 const MentalHealthChatbot: React.FC = () => {
   const location = useLocation();
   const locationState = location.state as { results?: TweetAnalysisResult[] };
-  const results: TweetAnalysisResult[] = locationState?.results || defaultResult;
+  const results: TweetAnalysisResult[] = locationState?.results || [];
 
+  const [assessmentReady, setAssessmentReady] = useState(false);
   const [messages, setMessages] = useState<{ role: 'bot' | 'user'; text: string }[]>([]);
-  const [input, setInput] = useState('');
-  const [categoryIndex, setCategoryIndex] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState<string[]>([]);
-  const [activeCategories, setActiveCategories] = useState<Category[]>([]);
   const [chatFinished, setChatFinished] = useState(false);
+  const [scores, setScores] = useState({
+    depression: 0,
+    anxiety: 0,
+    harassment: 0,
+    frustration: 0,
+  });
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
-  const categoryMap: { [key in Category]: string[] } = {
-    depression: depressionQuestions,
-    harassment: harassmentQuestions,
-    anxiety: anxietyQuestions,
-    frustration: frustrationQuestions,
+  const optionScores = {
+    'Yes': 2,
+    'Probably': 1,
+    'Maybe': 0,
+    'Probably Not': -1,
+    'No': -2,
   };
 
+  const availableOptions = Object.keys(optionScores);
+
   useEffect(() => {
-    detectCategories();
+    initializeScores();
+    const greeting = results.length
+      ? "Based on your recent social media activity, we'd like to ask you a few questions to understand your mental health better."
+      : "Hi there! Let's go through a few quick questions to understand how you're feeling today.";
+    
+    // Initialize with greeting only once
+    setMessages([{ role: 'bot', text: greeting }]);
+
+    // Ask first question immediately without timeout
+    askNextQuestion(0);
   }, []);
 
   useEffect(() => {
-    if (activeCategories.length > 0 && messages.length === 0) {
-      const first = categoryMap[activeCategories[categoryIndex]][questionIndex];
-      addBotMessage(first);
-    }
-  }, [activeCategories]);
-
-  // Scroll only the chat container when new messages are added
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const detectCategories = () => {
-    const categories: Category[] = [];
+  const initializeScores = () => {
+    let initialScores = { depression: 0, anxiety: 0, harassment: 0, frustration: 0 };
 
     results.forEach((res) => {
       const { sentiment, emotion, cbd } = res;
 
-      if (sentiment === 'Extremely Negative' || emotion === 'Sadness') {
-        if (!categories.includes('depression')) categories.push('depression');
-      }
-      if (emotion === 'Fear' || cbd !== 'not_cyberbullying') {
-        if (!categories.includes('harassment')) categories.push('harassment');
-      }
-      if (emotion === 'Fear' || sentiment === 'Slightly Negative') {
-        if (!categories.includes('anxiety')) categories.push('anxiety');
-      }
-      if (sentiment === 'Slightly Negative') {
-        if (!categories.includes('frustration')) categories.push('frustration');
-      }
+      if (sentiment === 'Extremely Negative') initialScores.depression += 2;
+      else if (sentiment === 'Slightly Negative') initialScores.frustration += 1;
+
+      if (emotion === 'Sadness') initialScores.depression += 1;
+      if (emotion === 'Fear') initialScores.anxiety += 2;
+      if (emotion === 'Anger') initialScores.frustration += 1;
+
+      if (cbd !== 'not_cyberbullying') initialScores.harassment += 2;
     });
 
-    if (categories.length === 0) {
-      categories.push('frustration');
-    }
-
-    setActiveCategories(categories);
+    setScores(initialScores);
   };
 
-  const addBotMessage = (text: string) => {
-    setMessages((prev) => [...prev, { role: 'bot', text }]);
+  const askNextQuestion = (index: number) => {
+    // Only ask if we haven't reached the end
+    if (index < questions.length) {
+      const q = questions[index];
+      setMessages((prev) => [...prev, { role: 'bot', text: q.question }]);
+    }
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleResponse = (response: string) => {
+    const currentQ = questions[questionIndex];
+    const score = optionScores[response as keyof typeof optionScores];
+    const weight = currentQ.weight ?? 1;
 
-    const userText = input.trim();
-    setMessages((prev) => [...prev, { role: 'user', text: userText }]);
-    setResponses((prev) => [...prev, userText]);
-    setInput('');
+    setScores((prev) => ({
+      ...prev,
+      [currentQ.category]: prev[currentQ.category as keyof typeof prev] + score * weight,
+    }));
 
-    if (userText.toLowerCase().includes('suicidal') || userText.toLowerCase().includes('self-harm')) {
-      addBotMessage('If you’re in danger or feeling suicidal, please contact 988 (Suicide & Crisis Lifeline) immediately.');
-    }
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', text: response },
+    ]);
 
-    const currentCat = activeCategories[categoryIndex];
-    const currentQ = categoryMap[currentCat];
+    const nextIndex = questionIndex + 1;
 
-    if (questionIndex + 1 < currentQ.length) {
-      setTimeout(() => {
-        addBotMessage(currentQ[questionIndex + 1]);
-        setQuestionIndex((prev) => prev + 1);
-      }, 800);
-    } else if (categoryIndex + 1 < activeCategories.length) {
-      setTimeout(() => {
-        setCategoryIndex((prev) => prev + 1);
-        setQuestionIndex(0);
-        addBotMessage(categoryMap[activeCategories[categoryIndex + 1]][0]);
-      }, 800);
+    if (nextIndex < questions.length) {
+      setQuestionIndex(nextIndex);
+      setTimeout(() => askNextQuestion(nextIndex), 800);
     } else {
+      setChatFinished(true);
       setTimeout(() => {
-        addBotMessage('Thank you for sharing. Based on your responses and social media input, we recommend seeking professional support.');
-        addBotMessage('Helpful resources:\n- Suicide Helpline: 988\n- MentalHealth.gov\n- NAMI.org');
-        setChatFinished(true);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'bot', text: "Thank you for your responses. We're analyzing them to generate a detailed assessment..." },
+        ]);
+        setTimeout(() => setAssessmentReady(true), 1500);
       }, 1000);
     }
   };
 
   return (
-    <div className="w-[90%] max-w-4xl mx-auto my-24 p-6 md:p-8 bg-gray-900 border border-gray-700 rounded-lg shadow-md font-poppins">
-  <h2 className="text-2xl font-semibold mb-6 text-white">
-    🧠 Mental Health Chatbot
-  </h2>
+    <div className="w-[90%] max-w-5xl mx-auto my-24 p-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg font-poppins">
+      <h2 className="text-2xl font-semibold mb-6 text-white flex items-center">
+        <span className="mr-2">🧠</span> Mental Health Assessment
+      </h2>
 
-  {/* Chat Messages Container */}
-  <div
-    ref={chatContainerRef}
-    className="w-full max-h-[400px] min-h-[200px] overflow-y-auto p-4 rounded-md text-white scrollbar-thin scrollbar-thumb-gray-600"
-  >
-    {messages.map((msg, idx) => (
-      <MessageBubble key={idx} role={msg.role} message={msg.text} />
-    ))}
-  </div>
+      <div
+        ref={chatRef}
+        className="w-full h-[400px] overflow-y-auto p-4 mb-4 bg-gray-800 rounded-lg text-white scrollbar-thin scrollbar-thumb-gray-600"
+      >
+        <div className="space-y-4">
+          {messages.map((msg, idx) => (
+            <MessageBubble key={idx} role={msg.role} message={msg.text} />
+          ))}
+        </div>
+      </div>
 
-  {/* Input box */}
-  {!chatFinished && (
-      <UserInput value={input} onChange={setInput} onSend={handleSend} />
-  )}
-</div>
+      {!chatFinished && messages.length > 0 && (
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {availableOptions.map((option) => (
+            <button
+              key={option}
+              onClick={() => handleResponse(option)}
+              className="px-2 py-2 bg-orange-500 hover:bg-orange-400 text-white font-medium rounded-md transition 
+                         text-sm sm:text-base whitespace-nowrap overflow-hidden text-ellipsis"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
 
-);
-
+      {assessmentReady && (
+        <div className="mt-6 animate-fadeIn">
+          <AssessmentReport scores={scores} />
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default MentalHealthChatbot;
