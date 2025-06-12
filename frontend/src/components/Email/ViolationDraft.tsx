@@ -16,7 +16,7 @@ const ViolationDraft: React.FC<ViolationDraftProps> = ({ violations }) => {
   const formattedViolations = violations
     .map(
       (v, index) =>
-        `Tweet ${index + 1}:\nLink: ${v.link}\n` +
+        `Post ${index + 1}:\nLink: ${v.link}\n` +
         v.violations.map(vi => `- ${vi.parameter} Violation: ${vi.value}`).join("\n")
     )
     .join("\n\n");

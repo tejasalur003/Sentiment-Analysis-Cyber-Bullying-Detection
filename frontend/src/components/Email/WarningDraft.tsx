@@ -16,7 +16,7 @@ const WarningDraft: React.FC<WarningDraftProps> = ({ violations }) => {
   const formatted = violations
     .map(
       (v, index) =>
-        `Tweet ${index + 1}:\nLink: ${v.link}\n` +
+        `Post ${index + 1}:\nLink: ${v.link}\n` +
         v.violations.map(vi => `- Warning for ${vi.parameter}: ${vi.value}`).join("\n")
     )
     .join("\n\n");

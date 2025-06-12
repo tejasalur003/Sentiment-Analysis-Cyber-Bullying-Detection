@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import requests
 
 def get_latest_tweets(user_url: str, num: int) -> list:
     options = webdriver.ChromeOptions()
@@ -49,3 +50,46 @@ def get_latest_tweets(user_url: str, num: int) -> list:
 
     finally:
         driver.quit()
+
+
+import requests
+
+def extract_latest_reddit_posts(user_url, post_limit=3):
+    if not user_url.endswith(".json"):
+        user_url = user_url.rstrip("/") + ".json"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    try:
+        response = requests.get(user_url, headers=headers)
+        if response.status_code != 200:
+            return f"Error: Received status code {response.status_code}"
+
+        user_data = response.json()
+        posts = user_data["data"]["children"]
+
+        if not posts:
+            return "No posts found for this user."
+
+        extracted_posts = []
+        for post in posts[:post_limit]:
+            data = post["data"]
+            selftext = data.get("selftext", "").strip()
+            permalink = data.get("permalink", "")
+            full_link = f"https://www.reddit.com{permalink}" if permalink else None
+            content = selftext if selftext else None
+
+            if full_link or content:
+                extracted_posts.append({
+                    "link": full_link,
+                    "text": content
+                })
+
+        return extracted_posts
+
+    except Exception as e:
+        return f"Error extracting user posts: {e}"
+
+
