@@ -12,7 +12,7 @@ from WebScraper.scraper import scrape_content
 from Models.cbd_predict import predict_cyberbullying
 from Models.cbd_predict import predict_cyberbullying_all
 from Models.emotion_predict import predict_emotion_detailed
-from WebScraper.profile_scrapper import get_latest_tweets
+from WebScraper.profile_scrapper import get_latest_tweets, extract_latest_reddit_posts
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
@@ -120,8 +120,39 @@ def profile_review():
     if not user_url or not isinstance(num, int):
         return jsonify({"error": "Missing or invalid 'url' or 'num' parameters"}), 400
 
-    tweets = get_latest_tweets(user_url, num)
-    return jsonify({"tweet_links": tweets})
+    try:
+        user_url = user_url.strip().lower()
+
+        if "twitter.com" in user_url or "x.com" in user_url:
+            tweets = get_latest_tweets(user_url, num)
+            return jsonify({
+                "platform": "twitter",
+                "tweet_links": tweets
+            })
+
+        elif "reddit.com" in user_url:
+            posts = extract_latest_reddit_posts(user_url, num)
+
+            if isinstance(posts, str):  # If error or no posts message was returned as a string
+                return jsonify({
+                    "platform": "reddit",
+                    "error": posts
+                }), 400
+
+            return jsonify({
+                "platform": "reddit",
+                "posts": posts  # List of {"link": ..., "text": ...}
+            })
+
+        else:
+            return jsonify({
+                "error": "Unsupported platform. Provide a valid Reddit or Twitter/X URL."
+            }), 400
+
+    except Exception as e:
+        return jsonify({
+            "error": f"Error processing profile: {str(e)}"
+        }), 500
 
 
 

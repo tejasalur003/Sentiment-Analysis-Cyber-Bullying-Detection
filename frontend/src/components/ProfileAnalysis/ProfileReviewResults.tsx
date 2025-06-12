@@ -6,8 +6,9 @@ import { predictCyberbullying } from "../../api/CBDPredict";
 import { predictEmotion } from "../../api/EmotionPredict";
 import Loader2 from "./loader2";
 
-interface ProfileReviewResultsProps {
-  tweetLinks: string[];
+interface RedditPost {
+  link: string;
+  text: string;
 }
 
 interface TweetAnalysisResult {
@@ -20,23 +21,35 @@ interface TweetAnalysisResult {
   cbd: string;
 }
 
-const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks }) => {
+interface ProfileReviewResultsProps {
+  platform: 'twitter' | 'reddit' | null;
+  tweetLinks: string[];
+  redditPosts: RedditPost[];
+}
+
+const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ platform, tweetLinks, redditPosts }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<(TweetAnalysisResult | null)[]>(Array(tweetLinks.length).fill(null));
+  const [results, setResults] = useState<(TweetAnalysisResult | null)[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const timerRef = useRef<number | null>(null);
 
+  const posts = platform === 'twitter'
+    ? tweetLinks.map(link => ({ link, text: "" }))
+    : redditPosts;
+
   useEffect(() => {
+    setResults(Array(posts.length).fill(null));
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [platform, tweetLinks, redditPosts]);
 
   const generateResult = async () => {
     setIsLoading(true);
-    let remaining = tweetLinks.length;
+    let remaining = posts.length;
     setTimeRemaining(remaining * 20);
 
     timerRef.current = window.setInterval(() => {
@@ -49,13 +62,16 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
       });
     }, 1000);
 
-    for (let i = 0; i < tweetLinks.length; i++) {
+    for (let i = 0; i < posts.length; i++) {
       setCurrentIndex(i);
+      const { link } = posts[i];
+      let text = posts[i].text;
 
       try {
-        const url = tweetLinks[i];
-        const data = await postScrape(url);
-        const text = data.content || "";
+        if (platform === "twitter") {
+          const data = await postScrape(link);
+          text = data.content || "";
+        }
 
         const { sentiment, score } = await predictSentiment(text);
         const cbd_result = await predictCyberbullying(text);
@@ -67,7 +83,7 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
         setResults(prev => {
           const updated = [...prev];
           updated[i] = {
-            link: url,
+            link,
             text,
             sentiment,
             score,
@@ -78,7 +94,7 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
           return updated;
         });
       } catch (err) {
-        console.error(`Failed to analyze tweet ${i + 1}:`, err);
+        console.error(`Failed to analyze post ${i + 1}:`, err);
       }
 
       remaining--;
@@ -95,17 +111,17 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
     if (validResults.length > 0) {
       navigate("/send-email", { state: { results: validResults } });
     } else {
-      alert("No results to analyze. Please analyze tweets first.");
+      alert("No results to analyze. Please analyze posts first.");
     }
   };
 
-  if (tweetLinks.length === 0) return null;
+  if (!platform || posts.length === 0) return null;
 
   return (
     <div className="w-[85%] max-w-5xl mx-auto mb-24 p-8 bg-black/60 backdrop-blur-md border border-gray-700 rounded-lg shadow-lg relative">
       {isLoading && <Loader2 timeRemaining={timeRemaining} />}
 
-      <h2 className="text-2xl font-bold mb-6 text-orange-400">Tweet Analysis Table</h2>
+      <h2 className="text-2xl font-bold mb-6 text-orange-400 capitalize">{platform} Analysis Table</h2>
 
       <div className="overflow-x-auto rounded-xl border border-gray-700">
         <table className="min-w-full bg-gray-800 table-auto text-sm">
@@ -118,20 +134,20 @@ const ProfileReviewResults: React.FC<ProfileReviewResultsProps> = ({ tweetLinks 
             </tr>
           </thead>
           <tbody>
-            {tweetLinks.map((link, index) => {
+            {posts.map((post, index) => {
               const result = results[index];
               const isAnalyzing = currentIndex === index;
 
               return (
                 <tr key={index} className="hover:bg-gray-700 transition-all duration-150">
                   <td className="px-6 py-4 border-t border-gray-700 max-w-[250px] text-blue-400 break-words">
-                    <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {link}
+                    <a href={post.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      {post.link}
                     </a>
                   </td>
                   <td className="px-6 py-4 border-t border-gray-700 text-gray-300">
                     {isAnalyzing
-                      ? `Analyzing (${index + 1}/${tweetLinks.length})...`
+                      ? `Analyzing (${index + 1}/${posts.length})...`
                       : result
                       ? `${result.sentiment} (${result.score.toFixed(2)})`
                       : "—"}

@@ -2,16 +2,24 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader";
 
-interface ProfileReviewInputProps {
-  onLinksFetched: (links: string[]) => void;
+interface RedditPost {
+  link: string;
+  text: string;
 }
 
-const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onLinksFetched }) => {
+interface ProfileReviewInputProps {
+  onResultsFetched: (result: {
+    platform: 'twitter' | 'reddit';
+    tweetLinks?: string[];
+    redditPosts?: RedditPost[];
+  }) => void;
+}
+
+const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onResultsFetched }) => {
   const [url, setUrl] = useState<string>("");
   const [num, setNum] = useState<number>(3);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [localTweetLinks, setLocalTweetLinks] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
@@ -38,13 +46,18 @@ const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onLinksFetched 
       }
 
       const data = await response.json();
-      const tweetLinks = data.tweet_links || [];
-      setLocalTweetLinks(tweetLinks);
-      onLinksFetched(tweetLinks);
+
+      if (data.platform === "twitter") {
+        onResultsFetched({ platform: "twitter", tweetLinks: data.tweet_links });
+      } else if (data.platform === "reddit") {
+        onResultsFetched({ platform: "reddit", redditPosts: data.posts });
+      } else {
+        setError("Unsupported platform or invalid response.");
+      }
+
     } catch (error) {
-      setError("Failed to fetch tweets. Please try again.");
-      setLocalTweetLinks([]);
-      onLinksFetched([]);
+      setError("Failed to fetch profile data. Please try again.");
+      onResultsFetched({ platform: 'twitter', tweetLinks: [] });
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +70,7 @@ const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onLinksFetched 
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <div className="w-full sm:w-4/5">
           <label className="block mb-2 text-xl font-semibold text-gray-200 tracking-wide">
-            Twitter Profile URL
+          User Profile Link
           </label>
           <input
             type="text"
@@ -70,7 +83,7 @@ const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onLinksFetched 
 
         <div className="w-full sm:w-1/5">
           <label className="block mb-2 text-xl font-semibold text-gray-200 tracking-wide">
-            No. of Tweets
+            No. of Posts
           </label>
           <select
             value={num}
@@ -91,7 +104,7 @@ const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onLinksFetched 
           onClick={handleProfileReview}
           className="px-6 py-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-md transition duration-300 tracking-wide"
         >
-          {isLoading ? "Fetching..." : "Check Tweets"}
+          {isLoading ? "Fetching..." : "Analyze"}
         </button>
       </div>
 
