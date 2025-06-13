@@ -33,7 +33,7 @@ const Navbar = () => {
       {/* Nav Links */}
       <div className="flex space-x-6 text-slate-100">
         <NavItem title="Profile Review" href="profile-review" />
-        <NavItem title="Adjust Tone" href="#" />
+        {/* <NavItem title="Adjust Tone" href="#" /> */}
         <NavItem title="Mental Health Support" href="mental-health-support" />
         <Dropdown
           title="More"

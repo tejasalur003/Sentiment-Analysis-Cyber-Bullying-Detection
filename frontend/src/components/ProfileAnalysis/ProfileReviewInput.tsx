@@ -70,7 +70,7 @@ const ProfileReviewInput: React.FC<ProfileReviewInputProps> = ({ onResultsFetche
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <div className="w-full sm:w-4/5">
           <label className="block mb-2 text-xl font-semibold text-gray-200 tracking-wide">
-          User Profile Link
+          Profile URL
           </label>
           <input
             type="text"
